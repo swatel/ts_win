@@ -1,0 +1,15 @@
+[ProcParams]
+proc1 = taskid
+
+[ProcNames]
+proc1 = SELECT * FROM RBS_WSELECT_PALLET(?)
+
+[html]
+html = #from time import gmtime, strftime #from rbsqutils import formatMxDateTime<div class="label ui-resizable ui-droppable" style="position: relative; background-color: white; height: 12cm; width: 9cm;"><div style="height: 3cm; width: 9cm; top: 0cm; left: 0cm; font-family: 'Times New Roman'; font-size: 1.2cm; text-align: center; position: absolute; overflow: hidden;" class="label ui-resizable ui-droppable ui-draggable"><span class="name">$main.TOOBJ</span></div><div style="height: 2cm; width: 9cm; top: 3cm; left: 0cm; font-family: 'Free 3 of 9 Extended'; font-size: 2cm; text-align: center; position: absolute; overflow: hidden;" class="label ui-resizable ui-droppable ui-draggable"><span class="name">$main.BARCODE</span></div><div style="height: 1.00529cm; width: 8.96825cm; top: 4.97355cm; left: 0cm; font-family: 'Times New Roman'; font-size: 0.8cm; text-align: center; position: absolute; overflow: hidden;" class="label ui-resizable ui-droppable ui-draggable"><span class="name">№$main.DOCNUM</span></div><div style="height: 1cm; width: 4cm; top: 5.97751cm; left: 3.62876cm; font-family: 'Times New Roman'; font-size: 0.8cm; text-align: center; position: absolute; overflow: hidden;" class="label ui-resizable ui-droppable ui-draggable"><span class="name"> $formatMxDateTime($main.DOCDATE, format="%d.%m.%Y")</span></div><div style="height: 1cm; width: 1cm; top: 5.97751cm; left: 2.65563cm; font-family: 'Times New Roman'; font-size: 0.8cm; text-align: center; position: absolute; overflow: hidden;" class="label ui-resizable ui-droppable ui-draggable"><span class="name">от</span></div><div style="height: 1cm; width: 9cm; top: 8cm; left: 0cm; font-family: 'Times New Roman'; font-size: 1cm; text-align: center; position: absolute; overflow: hidden;" class="label ui-resizable ui-droppable ui-draggable"><span class="name">$strftime("%d.%m.%Y %H:%M:%S", $gmtime())</span></div></div>
+
+[ProcDataList]
+proc1 = main
+
+[ProcFetches]
+proc1 = one
+

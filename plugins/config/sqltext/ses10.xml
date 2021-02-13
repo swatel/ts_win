@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<root>
+    <descript value="SQL text для запросов к БД чеков Кристалл"/>
+    <params>
+        <type_sale_code value="P"/>
+        <type_ret_code value="R"/>
+        <sql_get_sum value="
+         SELECT (round(sum(amount/100.0), 2)) as SUMMA
+         FROM public.erpi_purchase h
+    WHERE h.operday = %s
+    and %s is not null
+    and h.shop = %s"/>
+        <sql_head_check value="SET datestyle = &quot;ISO, DMY&quot;;
+        SELECT h.id AS DOCIDCASH,
+       h.saletime AS DOCDATE,
+      &apos;SALE&apos; AS DOCTYPE,
+       h.shop AS EXTERNALOBJCHECKID,
+       h.number AS NUMBER,
+      (round(h.amount/100.0, 2)) AS DOCSUMM
+  FROM public.erpi_purchase AS h
+ WHERE h.operday = %s
+   and h.shop = %s
+   and %s is not null
+   order by DOCIDCASH"/>
+        <sql_detail_check value="SELECT P.id_purchase AS DOCIDCASH,
+       cast(cast(P.goodscode as integer) as varchar(10)) AS WARESCODE,
+       sum(P.count/1000.0) AS AMOUNT,
+       P.costwithdiscount/100.0 AS PRICE,
+	   sum(P.amount/100.0)AS SUMMA
+  FROM erpi_positions AS P
+ WHERE P.id_purchase = %s
+ group by P.id_purchase, P.goodscode, P.costwithdiscount"/>
+    </params>
+</root>

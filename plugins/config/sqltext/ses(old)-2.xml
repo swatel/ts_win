@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<root>
+    <descript value="SQL text для запросов к БД чеков Кристалл"/>
+    <params>
+        <typesalecode value="P"/>
+        <typeretcode value="R"/>
+        <sqlgetsum value="SELECT abs(round(sum(h.Summa), 2)) as summa
+  FROM [ChequeHead] h WITH (NOLOCK) 
+  where h.Cash_Code &lt;&gt; &apos;&apos;
+    and convert(date, h.DateOperation) = ?
+    and h.StatusFiscal &lt;&gt; 0
+    and h.Status &lt;&gt; 0
+    and h.Operation = ?
+    and h.shopindex = ?"/>
+        <sqlheadcheck value="SET DATEFORMAT dmy;
+        SELECT h.ID AS _DOCIDCASH,
+       convert(datetime, h.DateOperation) AS _DOCDATE,
+       CAST(CASE WHEN h.Operation= &apos;P&apos; THEN &apos;SALE&apos; ELSE &apos;RET&apos; END AS varchar) AS _DOCTYPE,
+       h.ShopIndex AS _EXTERNALOBJCHECKID,
+       h.Ck_Number AS _NUMBER,
+       abs(h.Summa) AS _DOCSUMM
+  FROM ChequeHead AS h WITH (NOLOCK)
+ WHERE h.Cash_Code &lt;&gt; &apos;&apos;
+   and convert(date, h.DateOperation) = ?
+   and h.shopindex = ?
+   and h.Operation = ?
+   and h.StatusFiscal &lt;&gt; 0
+   and h.Status &lt;&gt; 0
+   order by _DOCIDCASH"/>
+        <sqldetailcheck value="SELECT P.ChequeId AS _DOCIDCASH,
+       cast(CAST(CASE WHEN LEFT(P.Code, 1)= &apos;_&apos; THEN REPLACE(P.code, &apos;_&apos;, &apos;&apos;) ELSE P.code END AS int) AS Varchar) AS _WARESCODE,
+       abs(P.Quant) AS _AMOUNT, 
+       P.Price AS _PRICE,
+	   abs(P.Summa) AS _SUMMA
+  FROM ChequePos AS P WITH (NOLOCK) 
+ WHERE P.ChequeId = ?"/>
+    </params>
+</root>

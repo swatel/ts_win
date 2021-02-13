@@ -1,0 +1,73 @@
+[ProcParams]
+proc1 = taskid
+proc2 = taskid
+
+[ProcNames]
+proc1 = select * from K_WMS_PRINT_SELECTBARCODE(?)
+proc2 = select * from K_WH_PACKLIST_WARES(?)
+
+[html]
+html = <div class="label ui-resizable ui-droppable" style="position: relative; background-color: white; height: 6.8cm; width: 9.5cm; font-size: 0.31746cm; font-family: 'Times New Roman'; text-align: center; top: 0cm; left: 0cm; border: 1px solid black;">
+            <div style="height: 2cm; width: 2cm; top: 0.0cm; left: 0.0cm; font-family: 'Times New Roman'; font-size: 2cm; text-align: left; position: absolute; overflow: hidden; border-style: none solid solid none; text-align: center;" class="label ui-resizable ui-droppable ui-draggable">
+                <span class="name">S</span>
+            </div>
+            <div style="height: 2cm; width: 7.5cm; top: 0cm; left: 2cm; font-family: 'Times New Roman'; font-size: 2cm; text-align: center; position: absolute; overflow: hidden;" class="label ui-resizable ui-droppable ui-draggable">
+                <span class="name">$d1.NUMBER</span>
+            </div>
+            <div style="height: 1cm; width: 9.5cm; top: 2.2cm; left: 0cm; font-family: 'Times New Roman'; font-size: 0.93cm; text-align: center; position: absolute; overflow: hidden;" class="label ui-resizable ui-droppable ui-draggable">
+                <span class="name">$d1.CONAME</span>
+            </div>
+            <div style="height: 3.2cm; width: 9.5cm; top: 3.4cm; left: 0cm; font-family: 'Free 3 of 9 Extended', 'Free 3 of 9', 'Free 3 of 9 Extended Regular'; font-size: 2cm; text-align: center; position: absolute; overflow: hidden;" class="label ui-resizable ui-droppable ui-draggable">
+                <span class="name">$d1.BARCODE</span>
+            </div>
+            <div style="height: 0.4761904761904762cm; width: 9.5cm; top: 5.2cm; left: -0.026455026455026457cm; font-family: 'Times New Roman'; font-size: 0.5cm; text-align: center; position: absolute; overflow: hidden;" class="label ui-resizable ui-droppable ui-draggable">
+                <span class="name">#from rbsqutils import formatMxDateTime
+                    $formatMxDateTime($d1.DOCDATE, format="%d.%m.%Y")&nbsp;&nbsp;&nbsp;№ $d1.DOCNUMBER</span>
+            </div>
+            <!--div style="height: 0.4761904761904762cm; width: 3cm; top: 4.9cm; left: 6.6cm; font-family: 'Times New Roman'; font-size: 0.5cm; text-align: center; position: absolute; overflow: hidden;" class="label ui-resizable ui-droppable ui-draggable">
+                <span class="name">
+                    #from rbsqutils import formatMxDateTime
+                    $formatMxDateTime($d1.DOCDATE, format="%d.%m.%Y")</span>
+            </div-->
+            <!--div style="height: 0.38cm; width: 7.41cm; top: 1.55cm; left: 0cm; font-family: 'Times New Roman'; font-size: 0.34cm; text-align: center; position: absolute; overflow: hidden;" class="label ui-resizable ui-droppable ui-draggable">
+                <span class="name">$d1.COADDRESS  адрес адрес адрес адрес адрес адрес адрес адрес адрес адрес адрес адрес адрес адрес  </span>
+            </div-->
+            <div style="height: 0.37cm; width: 4.5cm; top: 6.4cm; left: 0cm; font-family: 'Times New Roman'; font-size: 0.33cm; text-align: center; position: absolute; overflow: hidden;" class="label ui-resizable ui-droppable ui-draggable">
+                <span class="name">
+                    #from time import gmtime, strftime
+                    $strftime("%d.%m.%Y %H:%M:%S", $gmtime())</span>
+            </div>
+            <div style="height: 0.37cm; width: 5cm; top: 6.4cm; left: 4.5cm; font-family: 'Times New Roman'; font-size: 0.33cm; text-align: center; position: absolute; overflow: hidden;" class="label ui-resizable ui-droppable ui-draggable">
+                <span class="name">$d1.EMPL</span>
+            </div>
+            <!--div style="height: 0.5cm; width: 1cm; top: 4.9cm; left: 5.608465608465609cm; font-family: 'Times New Roman'; font-size: 0.5cm; text-align: center; position: absolute; overflow: hidden;" class="label ui-resizable ui-droppable ui-draggable">
+                <span class="name">Дата</span>
+            </div-->
+            <div style="height: 0.5cm; width: 1.50794cm; top: 5.9cm; left: 0.0cm; font-family: 'Times New Roman'; font-size: 0.39cm; text-align: center; position: absolute; overflow: hidden;" class="label ui-resizable ui-droppable ui-draggable">
+                <span class="name">Объём:</span>
+            </div>
+            <div style="height: 0.5cm; width: 1.7cm; top: 5.85cm; left: 1.50794cm; font-family: 'Times New Roman'; font-size: 0.5cm; text-align: center; position: absolute; overflow: hidden;" class="label ui-resizable ui-droppable ui-draggable">
+                <span class="name">$d1.CAPACITY</span>
+            </div>
+            <div style="height: 0.5cm; width: 1cm; top: 5.9cm; left: 3.4cm; font-family: 'Times New Roman'; font-size: 0.39cm; text-align: center; position: absolute; overflow: hidden;" class="label ui-resizable ui-droppable ui-draggable">
+                <span class="name">Вес:</span>
+            </div>
+            <div style="height: 0.5cm; width: 1.957671957671958cm; top: 5.85cm; left: 4.4cm; font-family: 'Times New Roman'; font-size: 0.5cm; text-align: center; position: absolute; overflow: hidden;" class="label ui-resizable ui-droppable ui-draggable">
+                <span class="name">$d1.WEIGHT</span>
+            </div>
+            <div style="height: 0.5cm; width: 2cm; top: 5.9cm; left: 6.5cm; font-family: 'Times New Roman'; font-size: 0.39cm; text-align: center; position: absolute; overflow: hidden;" class="label ui-resizable ui-droppable ui-draggable">
+                <span class="name">Товаров:</span>
+            </div>
+            <div style="height: 0.5026455026455027cm; width: 1cm; top: 5.85cm; left: 8.5cm; font-family: 'Times New Roman'; font-size: 0.499cm; text-align: center; position: absolute; overflow: hidden;" class="label ui-resizable ui-droppable ui-draggable">
+                <span class="name">$d1.POSCNT</span>
+            </div>
+        </div>
+
+[ProcDataList]
+proc1 = d1
+proc2 = w1
+
+[ProcFetches]
+proc1 = one
+proc2 = all
+

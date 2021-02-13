@@ -1,0 +1,37 @@
+[INCOME]
+procdocument=select * from RBS_Q_MY_IMPDOCXML(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+paramsdocument=TYPEDOC,NUMBERDOC,CDATEDOC,CDATEPRINT,FROMID,FROMCODE,FROMNAME,FROMTYPE,TOID,TOCODE,TONAME,TOTYPE,EXTERNALID,CUSTOMERNUMBERDOC,CCUSTOMERDATEDOC,SUMWITHNDS,THROUGHID,THROUGHCODE,THROUGHNAME,THROUGHTYPE,DOCID_INPUT
+#связь RBS полей с полями из XML файла
+TYPEDOC=typedoc
+NUMBERDOC=numberdoc
+CDATEDOC=datedoc
+CDATEPRINT=customerdocdate
+FROMID=fromobjid
+FROMCODE=fromobjcode
+FROMNAME=fromobjname
+FROMTYPE=fromobjtype
+TOID=toobjid
+TOCODE=toobjcode
+TONAME=toobjname
+TOTYPE=toobjtype
+EXTERNALID=id1c
+CCUSTOMERDATEDOC=customerdocdate
+CUSTOMERNUMBERDOC=customernumberdoc
+SUMWITHNDS=sumwithnds
+THROUGHID=throughobjid
+THROUGHCODE=throughobjcode
+THROUGHNAME=throughobjname
+THROUGHTYPE=throughobjtype
+DOCID_INPUT=docid
+
+proccargo=execute procedure RBS_Q_MY_IMPCARGOXML(?,?,?,?,?,?,?,?,?,?)
+paramscargo=CODEWARES,NAMEWARES,AMOUNT,CPRICE,CDOCSUM,CODEUNIT,EXTERNALTAXCODE
+#связь RBS полей с полями из XML файла
+# DOCID,ACTIONSTATUS,SUMWITHNDS эти параметра должны обязательно идти первыми и беруться из процедуры создания документ
+CODEWARES=warescode
+NAMEWARES=waresname
+AMOUNT=quantity
+CPRICE=price
+CDOCSUM=docsum
+CODEUNIT=mainunit
+EXTERNALTAXCODE=tax

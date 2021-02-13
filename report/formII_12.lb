@@ -1,0 +1,100 @@
+#encoding cp1251
+#from rbsqutils import formatMxDateTime
+Декларация об объеме розничной продажи пива и пивных напитков, сидра, пуаре и медовухи Раздел II
+<table border="1" cellpadding="0" cellspacing="0" style="font-size:11px">
+ <thead>
+   <tr>
+        <td rowspan="2"># п/п</td>
+        <td rowspan="2">Вид продукции</td>
+        <td rowspan="2">Код вида продукции</td>
+        <td colspan="3">Сведения о производителе/импортере</td>
+        <td colspan="3">Сведения о поставщике продукции</td>
+        <td rowspan="2">Дата закупки(дата отгрузки поставщиком)</td>
+        <td rowspan="2">Номер ТТН</td>
+        <td rowspan="2">Номер таможенной декларации</td>
+        <td rowspan="2">Объем закупленной продукции</td>
+    </tr>
+    <tr>
+        <td>Наименование производителя/импортера</td>
+        <td>ИНН</td>
+        <td>КПП</td>
+        <td>Наименование организации</td>
+        <td>ИНН</td>
+        <td>КПП</td>
+    </tr>
+    <tr>
+        <td>А</td>
+        <td>1</td>
+        <td>2</td>
+        <td>3</td>
+        <td>4</td>
+        <td>5</td>
+        <td>6</td>
+        <td>7</td>
+        <td>8</td>
+        <td>9</td>
+        <td>10</td>
+        <td>11</td>
+        <td>12</td>
+    </tr>
+  </thead>
+  <tbody>
+  <tr>
+      <td colspan="17">
+          По организации: $org_info['FULLNAME'] ИНН/КПП: $org_info['INN']/$org_info['KPP'] Адрес: $org_info['ADDRESS']
+      </td>
+      #set $i = 1
+      #for $item in $org_data
+            <tr>
+            #if not 'STR' in $item
+                <td> $i</td>
+                #set $i = $i + 1
+                <td>$item.wareskind.NAME</td>
+                <td>$item.wareskind.CODE</td>
+                <td>$item.IMPNAME</td>
+                <td>$item.IMPINN</td>
+                <td>$item.IMPKPP</td>
+                <td>$item.postavschic.FULLNAME</td>
+                <td>$item.postavschic.INN</td>
+                <td>$item.postavschic.KPP</td>
+                <td>$formatMxDateTime($item.post_prod.docdate,'%d.%m.%Y')</td>
+                <td>$item.post_prod.ttn</td>
+                <td>$item.post_prod.gtd</td>
+                <td>$item.post_prod.pvolume</td>
+            #else
+                <td colspan="12">$item.STR</td>
+                <td>$item.VALUE</td>
+            #end if
+
+            </tr>
+      #end for
+      #for $item in $shops
+        <tr>
+        #if not 'STR' in $item
+            <td> $i</td>
+            #set $i = $i + 1
+            <td>$item.wareskind.NAME</td>
+            <td>$item.wareskind.CODE</td>
+            <td>$item.IMPNAME</td>
+            <td>$item.IMPINN</td>
+            <td>$item.IMPKPP</td>
+            <td>$item.postavschic.FULLNAME</td>
+            <td>$item.postavschic.INN</td>
+            <td>$item.postavschic.KPP</td>
+            <td>$formatMxDateTime($item.post_prod.docdate,'%d.%m.%Y')</td>
+            <td>$item.post_prod.ttn</td>
+            <td>$item.post_prod.gtd</td>
+            <td>$item.post_prod.pvolume</td>
+        #else
+            #if 'VALUE' in $item
+                <td colspan="12">$item.STR</td>
+                <td>$item.VALUE</td>
+            #else
+                <td colspan="13">$item.STR</td>
+            #end if
+        #end if
+        </tr>
+      #end for
+      <tr>
+  </tbody>
+</table>

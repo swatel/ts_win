@@ -1,0 +1,256 @@
+# файл для импорта документов
+# Настройка ключей по которым определяется как будет обрабатываться файл XML
+#   paramsdocumentfirstastag - Параметр, который означает брать первый параметр, как название корня файла
+#   convertparamsbool - название параметров, которые нужно преобразовывать из строковых булевых в числовые
+#   procdocument - процедура, которая будет импортировать шапку документа
+#   paramsdocumentconst - параметры, которые не изменяются
+#   tagdocumentconst - название тега, в котором находятся не изменяемые параметры
+#   paramsdocumentoutside - параметры, которые могут измениться
+#   paramsdocoutside - параметр, который определяет порядок формирования параметром для ХП, если = 0 то прямой порядок, = 1 обратный
+#
+#   paramscargoconst - параметры которые переносятся из процедуры создания документа
+#   paramscargo - параметры, которые берутся из файла для товарных позиций
+#   tagcargo - название тега товарных позиций
+
+[VERSIONS]
+version = '0.0.0.1'
+
+[DELETE]
+statusvalue=ПомеченНаУдаление
+status=status
+externalid=id1c
+
+[INCOME]
+procdocument=select * from RBS_Q_IMPDOCXML_BPL(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+paramsdocument=TYPEDOC,NUMBERDOC,CDATEDOC,CDATEPRINT,FROMCODE,FROMNAME,FROMTYPE,TOCODE,TONAME,TOTYPE,EXTERNALID,CUSTOMERNUMBERDOC,CCUSTOMERDATEDOC,SUMWITHNDS,THROUGHCODE,THROUGHNAME,THROUGHTYPE,SUBTYPEDOC,DESCRIPT,STATUSDOCFILE
+paramsdocumentoutside=0
+paramsdocumentfirstastag = 0
+convertparamsbool=None
+paramsdocumentconst=None
+tagdocumentconst=None
+#связь RBS полей с полями из XML файла
+TYPEDOC=typedoc
+NUMBERDOC=numberdoc
+CDATEDOC=datedoc
+CDATEPRINT=dateprintdoc
+FROMCODE=fromobjcode
+FROMNAME=fromobjname
+FROMTYPE=fromobjtype
+TOCODE=toobjcode
+TONAME=toobjname
+TOTYPE=toobjtype
+EXTERNALID=idexternal
+CCUSTOMERDATEDOC=None
+CUSTOMERNUMBERDOC=None
+SUMWITHNDS=sumwithnds
+THROUGHCODE=None
+THROUGHNAME=None
+THROUGHTYPE=None
+SUBTYPEDOC=statusdoc
+DESCRIPT=None
+STATUSDOCFILE=status
+
+proccargo=execute procedure RBS_Q_IMPCARGOXML_BPL(?,?,?,?,?,?,?,?,?,?,?)
+#,?)
+paramscargo=CODEWARES,NAMEWARES,AMOUNT,CPRICE,CDOCSUM,CODEUNIT,EXTERNALTAXCODE,IFACTOR
+#,BASECODEUNIT
+paramscargoconst=DOCID,NAMEPROC,OSUMWITHNDS
+tagcargo=cargo
+#связь RBS полей с полями из XML файла
+CODEWARES=warescode
+NAMEWARES=waresname
+AMOUNT=quantity
+CPRICE=price
+CDOCSUM=docsum
+CODEUNIT=mainunit
+EXTERNALTAXCODE=tax
+IFACTOR=factor
+#BASECODEUNIT=baseunit
+
+[CLIENTORD]
+procdocument=select * from RBS_Q_IMPDOCXML_BPL(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+paramsdocument=TYPEDOC,NUMBERDOC,CDATEDOC,CDATEPRINT,FROMCODE,FROMNAME,FROMTYPE,TOCODE,TONAME,TOTYPE,EXTERNALID,CUSTOMERNUMBERDOC,CCUSTOMERDATEDOC,SUMWITHNDS,THROUGHCODE,THROUGHNAME,THROUGHTYPE,SUBTYPEDOC,DESCRIPT,STATUSDOCFILE
+paramsdocumentoutside=0
+paramsdocumentfirstastag = 0
+convertparamsbool=None
+paramsdocumentconst=None
+tagdocumentconst=None
+#связь RBS полей с полями из XML файла
+TYPEDOC=typedoc
+NUMBERDOC=numberdoc
+CDATEDOC=datedoc
+CDATEPRINT=dateprintdoc
+FROMCODE=fromobjcode
+FROMNAME=fromobjname
+FROMTYPE=fromobjtype
+TOCODE=toobjcode
+TONAME=toobjname
+TOTYPE=toobjtype
+EXTERNALID=idexternal
+CCUSTOMERDATEDOC=None
+CUSTOMERNUMBERDOC=None
+SUMWITHNDS=sumwithnds
+THROUGHCODE=None
+THROUGHNAME=None
+THROUGHTYPE=None
+SUBTYPEDOC=statusdoc
+DESCRIPT=None
+STATUSDOCFILE=status
+
+proccargo=execute procedure RBS_Q_IMPCARGOXML_BPL(?,?,?,?,?,?,?,?,?,?,?)
+#,?)
+paramscargo=CODEWARES,NAMEWARES,AMOUNT,CPRICE,CDOCSUM,CODEUNIT,EXTERNALTAXCODE,IFACTOR
+#,BASECODEUNIT
+paramscargoconst=DOCID,NAMEPROC,OSUMWITHNDS
+tagcargo=cargo
+#связь RBS полей с полями из XML файла
+CODEWARES=warescode
+NAMEWARES=waresname
+AMOUNT=quantity
+CPRICE=price
+CDOCSUM=docsum
+CODEUNIT=mainunit
+EXTERNALTAXCODE=tax
+IFACTOR=factor
+#BASECODEUNIT=baseunit
+
+[RETURNTO]
+procdocument=select * from RBS_Q_IMPDOCXML_BPL(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+paramsdocument=TYPEDOC,NUMBERDOC,CDATEDOC,CDATEPRINT,FROMCODE,FROMNAME,FROMTYPE,TOCODE,TONAME,TOTYPE,EXTERNALID,CUSTOMERNUMBERDOC,CCUSTOMERDATEDOC,SUMWITHNDS,THROUGHCODE,THROUGHNAME,THROUGHTYPE,SUBTYPEDOC,DESCRIPT,STATUSDOCFILE
+paramsdocumentoutside=0
+paramsdocumentfirstastag = 0
+convertparamsbool=None
+paramsdocumentconst=None
+tagdocumentconst=None
+#связь RBS полей с полями из XML файла
+TYPEDOC=typedoc
+NUMBERDOC=numberdoc
+CDATEDOC=datedoc
+CDATEPRINT=dateprintdoc
+FROMCODE=fromobjcode
+FROMNAME=fromobjname
+FROMTYPE=fromobjtype
+TOCODE=toobjcode
+TONAME=toobjname
+TOTYPE=toobjtype
+EXTERNALID=idexternal
+CCUSTOMERDATEDOC=None
+CUSTOMERNUMBERDOC=None
+SUMWITHNDS=sumwithnds
+THROUGHCODE=None
+THROUGHNAME=None
+THROUGHTYPE=None
+SUBTYPEDOC=None
+DESCRIPT=None
+STATUSDOCFILE=status
+
+proccargo=execute procedure RBS_Q_IMPCARGOXML_BPL(?,?,?,?,?,?,?,?,?,?,?)
+#,?)
+paramscargo=CODEWARES,NAMEWARES,AMOUNT,CPRICE,CDOCSUM,CODEUNIT,EXTERNALTAXCODE,IFACTOR
+#,BASECODEUNIT
+paramscargoconst=DOCID,NAMEPROC,OSUMWITHNDS
+tagcargo=cargo
+#связь RBS полей с полями из XML файла
+CODEWARES=warescode
+NAMEWARES=waresname
+AMOUNT=quantity
+CPRICE=price
+CDOCSUM=docsum
+CODEUNIT=mainunit
+EXTERNALTAXCODE=tax
+IFACTOR=factor
+#BASECODEUNIT=baseunit
+
+[BUYRETURN]
+procdocument=select * from RBS_Q_IMPDOCXML_BPL(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+paramsdocument=TYPEDOC,NUMBERDOC,CDATEDOC,CDATEPRINT,FROMCODE,FROMNAME,FROMTYPE,TOCODE,TONAME,TOTYPE,EXTERNALID,CUSTOMERNUMBERDOC,CCUSTOMERDATEDOC,SUMWITHNDS,THROUGHCODE,THROUGHNAME,THROUGHTYPE,SUBTYPEDOC,DESCRIPT,STATUSDOCFILE
+paramsdocumentoutside=0
+paramsdocumentfirstastag = 0
+convertparamsbool=None
+paramsdocumentconst=None
+tagdocumentconst=None
+#связь RBS полей с полями из XML файла
+TYPEDOC=typedoc
+NUMBERDOC=numberdoc
+CDATEDOC=datedoc
+CDATEPRINT=dateprintdoc
+FROMCODE=fromobjcode
+FROMNAME=fromobjname
+FROMTYPE=fromobjtype
+TOCODE=toobjcode
+TONAME=toobjname
+TOTYPE=toobjtype
+EXTERNALID=idexternal
+CCUSTOMERDATEDOC=None
+CUSTOMERNUMBERDOC=None
+SUMWITHNDS=sumwithnds
+THROUGHCODE=None
+THROUGHNAME=None
+THROUGHTYPE=None
+SUBTYPEDOC=None
+DESCRIPT=None
+STATUSDOCFILE=status
+
+proccargo=execute procedure RBS_Q_IMPCARGOXML_BPL(?,?,?,?,?,?,?,?,?,?,?)
+#,?)
+paramscargo=CODEWARES,NAMEWARES,AMOUNT,CPRICE,CDOCSUM,CODEUNIT,EXTERNALTAXCODE,IFACTOR
+#,BASECODEUNIT
+paramscargoconst=DOCID,NAMEPROC,OSUMWITHNDS
+tagcargo=cargo
+#связь RBS полей с полями из XML файла
+CODEWARES=warescode
+NAMEWARES=waresname
+AMOUNT=quantity
+CPRICE=price
+CDOCSUM=docsum
+CODEUNIT=mainunit
+EXTERNALTAXCODE=tax
+IFACTOR=factor
+#BASECODEUNIT=baseunit
+
+[SALE]
+procdocument=select * from RBS_Q_IMPDOCXML_BPL(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+paramsdocument=TYPEDOC,NUMBERDOC,CDATEDOC,CDATEPRINT,FROMCODE,FROMNAME,FROMTYPE,TOCODE,TONAME,TOTYPE,EXTERNALID,CUSTOMERNUMBERDOC,CCUSTOMERDATEDOC,SUMWITHNDS,THROUGHCODE,THROUGHNAME,THROUGHTYPE,SUBTYPEDOC,DESCRIPT,STATUSDOCFILE
+paramsdocumentoutside=0
+paramsdocumentfirstastag = 0
+convertparamsbool=None
+paramsdocumentconst=None
+tagdocumentconst=None
+#связь RBS полей с полями из XML файла
+TYPEDOC=typedoc
+NUMBERDOC=numberdoc
+CDATEDOC=datedoc
+CDATEPRINT=dateprintdoc
+FROMCODE=fromobjcode
+FROMNAME=fromobjname
+FROMTYPE=fromobjtype
+TOCODE=toobjcode
+TONAME=toobjname
+TOTYPE=toobjtype
+EXTERNALID=idexternal
+CCUSTOMERDATEDOC=None
+CUSTOMERNUMBERDOC=None
+SUMWITHNDS=sumwithnds
+THROUGHCODE=None
+THROUGHNAME=None
+THROUGHTYPE=None
+SUBTYPEDOC=statusdoc
+DESCRIPT=None
+STATUSDOCFILE=status
+
+proccargo=execute procedure RBS_Q_IMPCARGOXML_BPL(?,?,?,?,?,?,?,?,?,?,?)
+#,?)
+paramscargo=CODEWARES,NAMEWARES,AMOUNT,CPRICE,CDOCSUM,CODEUNIT,EXTERNALTAXCODE,IFACTOR
+#,BASECODEUNIT
+paramscargoconst=DOCID,NAMEPROC,OSUMWITHNDS
+tagcargo=cargo
+#связь RBS полей с полями из XML файла
+CODEWARES=warescode
+NAMEWARES=waresname
+AMOUNT=quantity
+CPRICE=price
+CDOCSUM=docsum
+CODEUNIT=mainunit
+EXTERNALTAXCODE=tax
+IFACTOR=factor
+#BASECODEUNIT=baseunit

@@ -1,0 +1,36 @@
+[ProcParams]
+proc1 = taskid
+
+[ProcNames]
+proc1 = SELECT * FROM RBS_WSELECT_PALLET(?)
+
+[html]
+html = #from time import gmtime, strftime
+    #from rbsqutils import formatMxDateTime
+    <div style="border: 1px solid black; position: relative; background-color: white; height: 7.2cm; width: 10cm; font-size: 0.3174603174603175cm; font-family: 'Times New Roman'; text-align: center; top: 0cm; left: 0cm;">
+        <div style="height: 2.6cm; width: 10cm; top: 0cm; left: 0cm; font-family: 'Times New Roman'; font-size: 1.1cm; text-align: center; position: absolute; overflow: hidden;">
+            <span>$main.TOOBJ</span>
+        </div>
+        <div style="height: 3.0105820105820107cm; width: 10cm; top: 3cm; left: 0cm; font-family: 'Free 3 of 9 Extended', 'Free 3 of 9 Extended Regular', 'Free 3 of 9'; font-size: 2.5cm; text-align: center; position: absolute; overflow: hidden;">
+            <span>*$main.BARCODE*</span>
+        </div>
+        <div style="height: 1.00529cm; width: 10cm; top: 5cm; left: 0cm; font-family: 'Times New Roman'; font-size: 0.8cm; text-align: center; position: absolute; overflow: hidden;">
+            <span>№$main.DOCNUM</span>
+        </div>
+        <div style="height: 1cm; width: 4cm; top: 5.8cm; left: 3.650793650793651cm; font-family: 'Times New Roman'; font-size: 0.6cm; text-align: center; position: absolute; overflow: hidden;">
+            <span> $formatMxDateTime($main.DOCDATE, format="%d.%m.%Y")</span>
+        </div>
+        <div style="height: 1cm; width: 1cm; top: 5.8cm; left: 2.671957671957672cm; font-family: 'Times New Roman'; font-size: 0.6cm; text-align: center; position: absolute; overflow: hidden;">
+            <span>от</span>
+        </div>
+        <div style="height: 0.8201058201058201cm; width: 10cm; top: 6.5cm; left: 0cm; font-family: 'Times New Roman'; font-size: 0.6cm; text-align: center; position: absolute; overflow: hidden;">
+            <span>$strftime("%d.%m.%Y %H:%M:%S", $gmtime())</span>
+        </div>
+    </div>
+
+[ProcDataList]
+proc1 = main
+
+[ProcFetches]
+proc1 = one
+

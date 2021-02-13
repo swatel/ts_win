@@ -1,0 +1,143 @@
+#encoding cp1251
+Декларация об объеме розничной продажи пива и пивных напитков, сидра, пуаре и медовухи Раздел I
+<table border="1" cellpadding="0" cellspacing="0" style="font-size:11px">
+    <thead>
+    <tr>
+        <td rowspan="4">№ п/п</td>
+        <td rowspan="4">Вид продукции</td>
+        <td rowspan="4">Код вида продукции</td>
+        <td colspan="3">Сведения о производителе/импортере</td>
+        <td rowspan="4">Остаток на начало отчетного периода</td>
+        <td colspan="7">Поступления</td>
+        <td colspan="4">Расход</td>
+        <td rowspan="4">Остаток продукции на конец отчетного периода</td>
+    </tr>
+    <tr>
+        <td rowspan="3">Наименование производителя/импортера</td>
+        <td rowspan="3">ИНН</td>
+        <td rowspan="3">КПП</td>
+        <td colspan="4">Закупки</td>
+        <td rowspan="3">Возврат от покупателя</td>
+        <td rowspan="3">Прочие поступления</td>
+        <td rowspan="3">Всего</td>
+        <td rowspan="3">Объем розничной продажи</td>
+        <td rowspan="3">Прочий расход</td>
+        <td rowspan="3">Возврат поставщику</td>
+        <td rowspan="3">Всего</td>
+    </tr>
+    <tr>
+        <td colspan="3">В том числе</td>
+        <td rowspan="2">Итого</td>
+    </tr>
+    <tr>
+        <td>От организаций-производителей</td>
+        <td>От организаций оптовой торговли</td>
+        <td>По импорту</td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+        <td>А</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td><td>14</td>
+        <td>15</td><td>16</td><td>17</td><td>18</td>
+    </tr>
+  <tr>
+      <td colspan="19">
+          По организации: $org_info['FULLNAME'] ИНН/КПП: $org_info['INN']/$org_info['KPP'] Адрес: $org_info['ADDRESS']
+      </td>
+  </tr>
+  #set $i = 1
+  #for $item in $org_movement
+    <tr>
+    #if $item.STR == ''
+        <td> $i</td>
+        #set $i = $i + 1
+        <td>$item.wareskind.NAME</td>
+        <td>$item.wareskind.CODE</td>
+        <td>$item.IMPNAME</td>
+        <td>$item.IMPINN</td>
+        <td>$item.IMPKPP</td>
+        <td>$item.movement.REST_BEG</td>
+        <td>$item.movement.PRODUCTION_INC</td>
+        <td>$item.movement.WHOLESALE_INC</td>
+        <td>$item.movement.IMPORT_INC</td>
+        <td>$item.movement.TOTAL_INC</td>
+        <td>$item.movement.RET_INC</td>
+        <td>$item.movement.OTHER_INC</td>
+        <td>$item.movement.TOTAL_INC_ALL</td>
+        <td>$item.movement.SALE_OUT</td>
+        <td>$item.movement.OTHER_OUT</td>
+        <td>$item.movement.SUPLRET_OUT</td>
+        <td>$item.movement.TOTAL_OUT</td>
+        <td>$item.movement.REST_END</td>
+
+    #else
+        <td colspan="6">$item.STR</td>
+        <td>$item.REST_BEG</td>
+        <td>$item.PRODUCTION_INC</td>
+        <td>$item.WHOLESALE_INC</td>
+        <td>$item.IMPORT_INC</td>
+        <td>$item.TOTAL_INC</td>
+        <td>$item.RET_INC</td>
+        <td>$item.OTHER_INC</td>
+        <td>$item.TOTAL_INC_ALL</td>
+        <td>$item.SALE_OUT</td>
+        <td>$item.OTHER_OUT</td>
+        <td>$item.SUPLRET_OUT</td>
+        <td>$item.TOTAL_OUT</td>
+        <td>$item.REST_END</td>
+    #end if
+    </tr>
+  #end for
+
+  #for $item in $shops
+    <tr>
+    #if $item.STR == ''
+        <td> $i</td>
+        #set $i = $i + 1
+        <td>$item.wareskind.NAME</td>
+        <td>$item.wareskind.CODE</td>
+        <td>$item.IMPNAME</td>
+        <td>$item.IMPINN</td>
+        <td>$item.IMPKPP</td>
+        <td>$item.movement.REST_BEG</td>
+        <td>$item.movement.PRODUCTION_INC</td>
+        <td>$item.movement.WHOLESALE_INC</td>
+        <td>$item.movement.IMPORT_INC</td>
+        <td>$item.movement.TOTAL_INC</td>
+        <td>$item.movement.RET_INC</td>
+        #set $a = $item.movement.OTHER_INC + $item.movement.MOVING_INC
+        <td>$a</td>
+        <td>$item.movement.TOTAL_INC_ALL</td>
+        <td>$item.movement.SALE_OUT</td>
+        #set $a = $item.movement.OTHER_OUT + $item.movement.MOVING_OUT
+        <td>$a</td>
+        <td>$item.movement.SUPLRET_OUT</td>
+        <td>$item.movement.TOTAL_OUT</td>
+        <td>$item.movement.REST_END</td>
+
+    #else
+        #if not 'REST_BEG' in $item
+            <td colspan="19"> $item.STR</td>
+        #else
+        <td colspan="6">$item.STR</td>
+        <td>$item.REST_BEG</td>
+        <td>$item.PRODUCTION_INC</td>
+        <td>$item.WHOLESALE_INC</td>
+        <td>$item.IMPORT_INC</td>
+        <td>$item.TOTAL_INC</td>
+        <td>$item.RET_INC</td>
+        #set $a = $item.OTHER_INC + $item.MOVING_INC
+        <td>$a</td>
+        <td>$item.TOTAL_INC_ALL</td>
+        <td>$item.SALE_OUT</td>
+        #set $a = $item.OTHER_OUT + $item.MOVING_OUT
+        <td>$a</td>
+        <td>$item.SUPLRET_OUT</td>
+        <td>$item.TOTAL_OUT</td>
+        <td>$item.REST_END</td>
+        #end if
+    #end if
+    </tr>
+  #end for
+  </tbody>
+</table>

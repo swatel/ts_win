@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<root>
+    <descript value="SQL text для запросов к БД чеков УКМ"/>
+    <params>
+        <type_sale_code value="P"/>
+        <type_ret_code value="R"/>
+        <sql_get_sum value="select SUM(a.SUMMA) as SUMMA
+from (
+ select SUM(CASE WHEN r.type in (1, 4) THEN - rp.amount ELSE rp.amount END) as SUMMA
+from receipt r   
+left join receipt_payment as rp 
+on r.id = rp.receipt_header                                       
+and r.cash_id = rp.cash_id                                      
+ and r.cash_number = rp.cash_number                                     
+ and r.store = rp.store 
+ where convert(DATE(r.date), date) =  %s
+ and r.store = rp.store   
+ and r.type in (0, 1, 4)   
+ and r.result = 0   
+ and rp.type = 0
+ and %s is not null
+ and r.store = %s
+ group by r.id, r.cash_id) a"/>
+        <sql_head_check value="select r.cash_id AS CASHID,
+       r.store AS EXTERNALOBJCHECKID,
+       r.id as DOCIDCASH,
+       r.date as DOCDATE,
+	   (CASE WHEN r.type in (1, 4) THEN &apos;SALE&apos; ELSE &apos;SALE&apos; END )AS DOCTYPE,
+	   r.global_number AS NUMBER,
+	   ROUND(CASE WHEN r.type in (1, 4) THEN - rp.amount ELSE rp.amount END, 2) AS DOCSUMM
+from receipt r
+	 left join receipt_payment as rp on r.id = rp.receipt_header
+                                     and r.cash_id = rp.cash_id
+                                     and r.cash_number = rp.cash_number
+                                     and r.store = rp.store
+where DATE_FORMAT(DATE(r.date), &apos;%d.%m.%Y&apos;) =  DATE_FORMAT(DATE(%s), &apos;%d.%m.%Y&apos;)
+and r.store = rp.store
+and r.type in (0, 1, 4)
+and r.result = 0
+and r.store = %s
+and rp.type = 0
+and %s is not null
+group by r.id, r.cash_id
+order by DOCIDCASH"/>
+        <sql_detail_check value="select r.cash_id,
+       r.id as DOCIDCASH,
+       r.cash_number,
+       ri.item as WARESCODE,        
+       SUM(CASE WHEN r.type in (1, 4) THEN - ri.total_quantity ELSE ri.total_quantity END) AS AMOUNT,       
+       ri.price as PRICE,        
+       ROUND(SUM(CASE WHEN r.type in (1, 4) THEN - ri.real_amount ELSE ri.real_amount END), 2) as SUMMA
+from receipt r   
+	 left join receipt_item as ri on r.store = ri.store                                  
+								 and r.cash_number = ri.cash_number                                   
+                                 and r.cash_id = ri.cash_id                                   
+                                 and r.id = ri.receipt_header
+where r.id = %s
+  and r.type in (0, 1, 4) 
+  and r.result = 0
+  and r.store = %s
+  and r.cash_id = %s
+  and ri.type = 0 
+  group by r.id, ri.item, ri.price"/>
+    </params>
+</root>

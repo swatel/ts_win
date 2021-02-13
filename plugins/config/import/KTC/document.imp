@@ -1,0 +1,269 @@
+# файл для импорта документов
+# Настройка ключей по которым определяется как будет обрабатываться файл XML
+#   queuebond_create создавать ли связь заданий и документа
+#   paramsdocumentfirstastag - Параметр, который означает брать первый параметр, как название корня файла
+#   convertparamsbool - название параметров, которые нужно преобразовывать из строковых булевых в числовые
+#   procdocument - процедура, которая будет импортировать шапку документа
+#   paramsdocumentconst - параметры, которые не изменяются
+#   tagdocumentconst - название тега, в котором находятся не изменяемые параметры
+#   paramsdocumentoutside - параметры, которые могут измениться
+#   paramsdocoutside - параметр, который определяет порядок формирования параметром для ХП, если = 0 то прямой порядок, = 1 обратный
+#
+#   paramscargoconst - параметры которые переносятся из процедуры создания документа
+#   paramscargo - параметры, которые берутся из файла для товарных позиций
+#   tagcargo - название тега товарных позиций
+
+[VERSIONS]
+version = '0.0.0.1'
+
+
+[INCOME]
+queuebond_create=0
+procdocument=select * from RBS_Q_IMPDOCXML_KTC(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+paramsdocument=TYPEDOC,NUMBERDOC,CDATEDOC,CDATEPRINT,FROMCODE,FROMNAME,FROMTYPE,FROMEXTID,TOCODE,TONAME,TOTYPE,TOEXTID,EXTERNALID,CUSTOMERNUMBERDOC,CCUSTOMERDATEDOC,SUMWITHNDS,THROUGHCODE,THROUGHNAME,THROUGHTYPE,THROUGHEXTID,SUBTYPEDOC,DESCRIPT,STATUSDOCFILE,QUEUEID,DOCBONDID,IDOCID
+paramsdocumentoutside=0
+paramsdocumentfirstastag = 0
+convertparamsbool=None
+paramsdocumentconst=None
+tagdocumentconst=None
+#связь RBS полей с полями из XML файла
+TYPEDOC=typedoc
+NUMBERDOC=numberdoc
+CDATEDOC=datedoc
+CDATEPRINT=None
+FROMCODE=fromobjcode
+FROMNAME=fromobjname
+FROMTYPE=fromobjtype
+FROMEXTID=fromobjid
+TOCODE=toobjcode
+TONAME=toobjname
+TOTYPE=toobjtype
+TOEXTID=toobjid
+EXTERNALID=idexternal
+CCUSTOMERDATEDOC=None
+CUSTOMERNUMBERDOC=None
+SUMWITHNDS=None
+THROUGHCODE=None
+THROUGHNAME=None
+THROUGHTYPE=None
+THROUGHEXTID=None
+SUBTYPEDOC=None
+DESCRIPT=None
+STATUSDOCFILE=status
+QUEUEID=None
+DOCBONDID=None
+IDOCID=None
+
+proccargo=select * from RBS_Q_IMPCARGOXML_KTC(?,?,?,?,?,?,?,?,?,?,?,?,?)
+#,?)
+paramscargo=CODEWARES,NAMEWARES,WARESEXTID,AMOUNT,CPRICE,CDOCSUM,CODEUNIT,EXTERNALTAXCODE,IFACTOR,SECONDARYID
+paramscargoconst=DOCID,NAMEPROC,OSUMWITHNDS
+tagcargo=cargo
+#связь RBS полей с полями из XML файла
+CODEWARES=warescode
+NAMEWARES=waresname
+WARESEXTID=None
+AMOUNT=quantity
+CPRICE=price
+CDOCSUM=docsum
+CODEUNIT=mainunit
+EXTERNALTAXCODE=tax
+IFACTOR=None
+SECONDARYID=None
+
+#proccargobond = execute procedure RBS_Q_IMPPRODUCTIONXML_U3S(?,?,?,?)
+#paramscargobond=AMOUNT,PRODUCTDATE
+#paramscargobondconst=ODOCID,WARESID
+#tagcargobond=productions
+#связь RBS полей с полями из XML файла
+#AMOUNT=quantity
+#PRODUCTDATE=date
+
+[SALE]
+queuebond_create=0
+procdocument=select * from RBS_Q_IMPDOCXML_KTC(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+paramsdocument=TYPEDOC,NUMBERDOC,CDATEDOC,CDATEPRINT,FROMCODE,FROMNAME,FROMTYPE,FROMEXTID,TOCODE,TONAME,TOTYPE,TOEXTID,EXTERNALID,CUSTOMERNUMBERDOC,CCUSTOMERDATEDOC,SUMWITHNDS,THROUGHCODE,THROUGHNAME,THROUGHTYPE,THROUGHEXTID,SUBTYPEDOC,DESCRIPT,STATUSDOCFILE,QUEUEID,DOCBONDID,IDOCID,ORDEREXTID
+paramsdocumentoutside=0
+paramsdocumentfirstastag = 0
+convertparamsbool=None
+paramsdocumentconst=None
+tagdocumentconst=None
+#связь RBS полей с полями из XML файла
+TYPEDOC=typedoc
+NUMBERDOC=numberdoc
+CDATEDOC=datedoc
+CDATEPRINT=None
+FROMCODE=fromobjcode
+FROMNAME=fromobjname
+FROMTYPE=fromobjtype
+FROMEXTID=fromobjid
+TOCODE=toobjcode
+TONAME=toobjname
+TOTYPE=toobjtype
+TOEXTID=toobjid
+EXTERNALID=idexternal
+CCUSTOMERDATEDOC=None
+CUSTOMERNUMBERDOC=None
+SUMWITHNDS=None
+THROUGHCODE=None
+THROUGHNAME=None
+THROUGHTYPE=None
+THROUGHEXTID=None
+SUBTYPEDOC=None
+DESCRIPT=None
+STATUSDOCFILE=status
+QUEUEID=None
+DOCBONDID=None
+IDOCID=None
+ORDEREXTID=orderextid
+
+proccargo=select * from RBS_Q_IMPCARGOXML_KTC(?,?,?,?,?,?,?,?,?,?,?,?,?)
+#,?)
+paramscargo=CODEWARES,NAMEWARES,WARESEXTID,AMOUNT,CPRICE,CDOCSUM,CODEUNIT,EXTERNALTAXCODE,IFACTOR,SECONDARYID
+paramscargoconst=DOCID,NAMEPROC,OSUMWITHNDS
+tagcargo=cargo
+#связь RBS полей с полями из XML файла
+CODEWARES=warescode
+NAMEWARES=waresname
+WARESEXTID=None
+AMOUNT=quantity
+CPRICE=price
+CDOCSUM=docsum
+CODEUNIT=mainunit
+EXTERNALTAXCODE=tax
+IFACTOR=None
+SECONDARYID=None
+
+#proccargobond = execute procedure RBS_Q_IMPPRODUCTIONXML_U3S(?,?,?,?)
+#paramscargobond=AMOUNT,PRODUCTDATE
+#paramscargobondconst=ODOCID,WARESID
+#tagcargobond=productions
+#связь RBS полей с полями из XML файла
+#AMOUNT=quantity
+#PRODUCTDATE=date
+
+[RESERVE]
+queuebond_create=0
+procdocument=select * from RBS_Q_IMPDOCXML_KTC(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+paramsdocument=TYPEDOC,NUMBERDOC,CDATEDOC,CDATEPRINT,FROMCODE,FROMNAME,FROMTYPE,FROMEXTID,TOCODE,TONAME,TOTYPE,TOEXTID,EXTERNALID,CUSTOMERNUMBERDOC,CCUSTOMERDATEDOC,SUMWITHNDS,THROUGHCODE,THROUGHNAME,THROUGHTYPE,THROUGHEXTID,SUBTYPEDOC,DESCRIPT,STATUSDOCFILE,QUEUEID,DOCBONDID,IDOCID,ORDEREXTID
+paramsdocumentoutside=0
+paramsdocumentfirstastag = 0
+convertparamsbool=None
+paramsdocumentconst=None
+tagdocumentconst=None
+#связь RBS полей с полями из XML файла
+TYPEDOC=typedoc
+NUMBERDOC=numberdoc
+CDATEDOC=datedoc
+CDATEPRINT=None
+FROMCODE=fromobjcode
+FROMNAME=fromobjname
+FROMTYPE=fromobjtype
+FROMEXTID=fromobjid
+TOCODE=toobjcode
+TONAME=toobjname
+TOTYPE=toobjtype
+TOEXTID=toobjid
+EXTERNALID=idexternal
+CCUSTOMERDATEDOC=None
+CUSTOMERNUMBERDOC=None
+SUMWITHNDS=None
+THROUGHCODE=None
+THROUGHNAME=None
+THROUGHTYPE=None
+THROUGHEXTID=None
+SUBTYPEDOC=None
+DESCRIPT=None
+STATUSDOCFILE=status
+QUEUEID=None
+DOCBONDID=None
+IDOCID=None
+ORDEREXTID=orderextid
+
+proccargo=select * from RBS_Q_IMPCARGOXML_KTC(?,?,?,?,?,?,?,?,?,?,?,?,?)
+#,?)
+paramscargo=CODEWARES,NAMEWARES,WARESEXTID,AMOUNT,CPRICE,CDOCSUM,CODEUNIT,EXTERNALTAXCODE,IFACTOR,SECONDARYID
+paramscargoconst=DOCID,NAMEPROC,OSUMWITHNDS
+tagcargo=cargo
+#связь RBS полей с полями из XML файла
+CODEWARES=warescode
+NAMEWARES=waresname
+WARESEXTID=None
+AMOUNT=quantity
+CPRICE=price
+CDOCSUM=docsum
+CODEUNIT=mainunit
+EXTERNALTAXCODE=tax
+IFACTOR=None
+SECONDARYID=None
+
+#proccargobond = execute procedure RBS_Q_IMPPRODUCTIONXML_U3S(?,?,?,?)
+#paramscargobond=AMOUNT,PRODUCTDATE
+#paramscargobondconst=ODOCID,WARESID
+#tagcargobond=productions
+#связь RBS полей с полями из XML файла
+#AMOUNT=quantity
+#PRODUCTDATE=date
+
+[ORDER]
+queuebond_create=0
+procdocument=select * from RBS_Q_IMPDOCXML_KTC(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+paramsdocument=TYPEDOC,NUMBERDOC,CDATEDOC,CDATEPRINT,FROMCODE,FROMNAME,FROMTYPE,FROMEXTID,TOCODE,TONAME,TOTYPE,TOEXTID,EXTERNALID,CUSTOMERNUMBERDOC,CCUSTOMERDATEDOC,SUMWITHNDS,THROUGHCODE,THROUGHNAME,THROUGHTYPE,THROUGHEXTID,SUBTYPEDOC,DESCRIPT,STATUSDOCFILE,QUEUEID,DOCBONDID,IDOCID,ORDEREXTID
+paramsdocumentoutside=0
+paramsdocumentfirstastag = 0
+convertparamsbool=None
+paramsdocumentconst=None
+tagdocumentconst=None
+#связь RBS полей с полями из XML файла
+TYPEDOC=typedoc
+NUMBERDOC=numberdoc
+CDATEDOC=datedoc
+CDATEPRINT=None
+FROMCODE=fromobjcode
+FROMNAME=fromobjname
+FROMTYPE=fromobjtype
+FROMEXTID=fromobjid
+TOCODE=toobjcode
+TONAME=toobjname
+TOTYPE=toobjtype
+TOEXTID=toobjid
+EXTERNALID=idexternal
+CCUSTOMERDATEDOC=None
+CUSTOMERNUMBERDOC=None
+SUMWITHNDS=None
+THROUGHCODE=None
+THROUGHNAME=None
+THROUGHTYPE=None
+THROUGHEXTID=None
+SUBTYPEDOC=None
+DESCRIPT=None
+STATUSDOCFILE=status
+QUEUEID=None
+DOCBONDID=None
+IDOCID=None
+ORDEREXTID=orderextid
+
+proccargo=select * from RBS_Q_IMPCARGOXML_KTC(?,?,?,?,?,?,?,?,?,?,?,?,?)
+#,?)
+paramscargo=CODEWARES,NAMEWARES,WARESEXTID,AMOUNT,CPRICE,CDOCSUM,CODEUNIT,EXTERNALTAXCODE,IFACTOR,SECONDARYID
+paramscargoconst=DOCID,NAMEPROC,OSUMWITHNDS
+tagcargo=cargo
+#связь RBS полей с полями из XML файла
+CODEWARES=warescode
+NAMEWARES=waresname
+WARESEXTID=None
+AMOUNT=quantity
+CPRICE=price
+CDOCSUM=docsum
+CODEUNIT=mainunit
+EXTERNALTAXCODE=tax
+IFACTOR=None
+SECONDARYID=None
+
+#proccargobond = execute procedure RBS_Q_IMPPRODUCTIONXML_U3S(?,?,?,?)
+#paramscargobond=AMOUNT,PRODUCTDATE
+#paramscargobondconst=ODOCID,WARESID
+#tagcargobond=productions
+#связь RBS полей с полями из XML файла
+#AMOUNT=quantity
+#PRODUCTDATE=date

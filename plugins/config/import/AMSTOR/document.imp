@@ -1,0 +1,58 @@
+# файл для импорта документов
+# Настройка ключей по которым определяется как будет обрабатываться файл XML
+#   paramsdocumentfirstastag - Параметр, который означает брать первый параметр, как название корня файла
+#   convertparamsbool - название параметров, которые нужно преобразовывать из строковых булевых в числовые
+#   procdocument - процедура, которая будет импортировать шапку документа
+#   paramsdocumentconst - параметры, которые не изменяются
+#   tagdocumentconst - название тега, в котором находятся не изменяемые параметры
+#   paramsdocument - параметры, которые могут измениться
+#   paramsdocumentoutside - параметры, которые могут измениться
+#   
+#   paramscargoconst - параметры которые переносятся из процедуры создания документа
+#   paramscargo - параметры, которые берутся из файла для товарных позиций
+#   tagcargo - название тега товарных позиций
+
+[VERSIONS]
+version = '0.0.0.1'
+
+
+[INCOME]
+procdocument=select * from RBS_Q_IMPDOCXML_PRODTORG(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+paramsdocument=TYPEDOC,NUMBERDOC,CDATEDOC,CDATEPRINT,FROMCODE,FROMNAME,FROMTYPE,TOCODE,TONAME,TOTYPE,EXTERNALID,CUSTOMERNUMBERDOC,CCUSTOMERDATEDOC,SUMWITHNDS,THROUGHCODE,THROUGHNAME,THROUGHTYPE,SUBTYPEDOC
+paramsdocumentoutside=0
+paramsdocumentfirstastag = 0
+convertparamsbool=None
+paramsdocumentconst=None
+tagdocumentconst=None
+#связь RBS полей с полями из XML файла
+TYPEDOC=typedoc
+NUMBERDOC=numberdoc
+CDATEDOC=datedoc
+CDATEPRINT=dateprintdoc
+FROMCODE=fromobjcode
+FROMNAME=fromobjname
+FROMTYPE=fromobjtype
+TOCODE=toobjcode
+TONAME=toobjname
+TOTYPE=toobjtype
+EXTERNALID=idexternal
+CCUSTOMERDATEDOC=customerdocdate
+CUSTOMERNUMBERDOC=customernumberdoc
+SUMWITHNDS=sumwithnds
+THROUGHCODE=throughobjcode
+THROUGHNAME=throughobjname
+THROUGHTYPE=throughobjtype
+SUBTYPEDOC=subtypedoc
+
+proccargo=execute procedure RBS_Q_IMPCARGOXML_PRODTORG(?,?,?,?,?,?,?,?,?,?)
+paramscargo=CODEWARES,NAMEWARES,AMOUNT,CPRICE,CDOCSUM,CODEUNIT,EXTERNALTAXCODE
+paramscargoconst=DOCID,NAMEPROC,OSUMWITHNDS
+tagcargo=cargo
+#связь RBS полей с полями из XML файла
+CODEWARES=warescode
+NAMEWARES=waresname
+AMOUNT=quantity
+CPRICE=price
+CDOCSUM=docsum
+CODEUNIT=mainunit
+EXTERNALTAXCODE=tax

@@ -1,0 +1,42 @@
+# файл для импорта документов
+# Настройка ключей по которым определяется как будет обрабатываться файл XML
+#   paramsdocumentfirstastag - Параметр, который означает брать первый параметр, как название корня файла
+#   convertparamsbool - название параметров, которые нужно преобразовывать из строковых булевых в числовые
+#   procdocument - процедура, которая будет импортировать шапку документа
+#   paramsdocumentconst - параметры, которые не изменяются
+#   tagdocumentconst - название тега, в котором находятся не изменяемые параметры
+#   paramsdocument - параметры, которые могут измениться
+#
+#   paramscargoconst - параметры которые переносятся из процедуры создания документа
+#   paramscargo - параметры, которые берутся из файла для товарных позиций
+#   tagcargo - название тега товарных позиций
+
+[VERSIONS]
+version = '0.0.0.1'
+
+[sales]
+procdocument=select * from RBS_Q_IMPDOCXML_HAB_PREAORDER(?,?,?,?,?)
+#TYPEDOC,EXTERNALCODEOBJ,NAMEOBJ,EXTERNALTYPEOBJ,IDOCDATE
+paramsdocumentfirstastag=1
+paramsdocumentconst=EXTERNALCODEOBJ,NAMEOBJ,EXTERNALTYPEOBJ
+tagdocumentconst=sales
+paramsdocument=IDOCDATE
+#связь RBS полей с полями из XML файла
+IDOCDATE=date
+EXTERNALCODEOBJ=codeobject
+NAMEOBJ=nameobject
+EXTERNALTYPEOBJ=typeobject
+
+namecargosection
+proccargo=execute procedure RBS_Q_IMPCARGOXML_HAB_PREAORDER(?,?,?,?,?,?,?)
+#DOCID,EXTERNALWARESCODE,NAMEWARES,IAMOUNT,IPRICE,IDOCSUM,CODEUNIT
+paramscargoconst=DOCID
+paramscargo=EXTERNALWARESCODE,NAMEWARES,IAMOUNT,IPRICE,IDOCSUM,CODEUNIT
+tagcargo=period
+#связь RBS полей с полями из XML файла
+EXTERNALWARESCODE=warescode
+NAMEWARES=waresname
+IAMOUNT=quantity
+IPRICE=None
+IDOCSUM=None
+CODEUNIT=mainunit

@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="ff9bcfea-aef4-4388-9b4b-b6cbed2c511d" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/compile_templates.bat" beforeDir="false" afterPath="$PROJECT_DIR$/compile_templates.bat" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>res</find>
+      <find>queuebond_create</find>
+      <find>Et</find>
+      <find>imp_wgroup</find>
+      <find>waresunit</find>
+      <find>__save_wares_unit</find>
+      <find>save</find>
+      <find>_wares_unit</find>
+      <find>unit</find>
+      <find>now</find>
+      <find>from . import</find>
+      <find>from .</find>
+      <find>GetConnect</find>
+      <find>Exep</find>
+      <find>Exception</find>
+      <find>if sys.exc_value[0]</find>
+      <find>fb_library_name</find>
+      <find># -*- coding: cp1251-*</find>
+      <find>krconst.</find>
+      <find>krconst</find>
+      <find>res['logfilename'].encode('windows-1251').replace('\\', '/')</find>
+      <find>encode('windows-1251')</find>
+      <find>sys.e</find>
+      <find>[0]</find>
+      <find>dbe</find>
+      <find>mainunit</find>
+      <find>XML строка не валидна</find>
+      <find>elf.parser_xml(self.taskparamsxml, 'CheckDir').replace('\\', '/')</find>
+      <find># coding=cp1251</find>
+      <find>cp1251</find>
+    </findStrings>
+    <replaceStrings>
+      <replace>exc[0]</replace>
+      <replace>exc[1]</replace>
+      <replace>from</replace>
+      <replace>import</replace>
+      <replace># -*- coding: utf-8-*</replace>
+      <replace>c.</replace>
+      <replace />
+    </replaceStrings>
+    <dirStrings>
+      <dir>D:\work\ritm-log\to_python3</dir>
+    </dirStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1d6l7s5mjAciaEvfSRez6AKEGES" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="false" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../UNS/TASKSERVER" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="options.lastSelected" value="Errors" />
+    <property name="options.searchVisible" value="true" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="options.splitter.main.proportions" value="0.3" />
+    <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="PythonConfigurationType" factoryName="Python">
+      <module name="TS-USR" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Python37\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/runserver.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="runserver" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="TS-USR" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Python37\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/runserver.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="ff9bcfea-aef4-4388-9b4b-b6cbed2c511d" name="Default Changelist" comment="" />
+      <created>1554413986303</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1554413986303</updated>
+      <workItem from="1554413987959" duration="4783000" />
+      <workItem from="1554762442042" duration="3054000" />
+      <workItem from="1555447402412" duration="6995000" />
+      <workItem from="1555705877001" duration="1174000" />
+      <workItem from="1556147829605" duration="2047000" />
+      <workItem from="1556922753059" duration="1977000" />
+      <workItem from="1557138212126" duration="604000" />
+      <workItem from="1557264534649" duration="4163000" />
+      <workItem from="1561413691892" duration="208000" />
+      <workItem from="1561413920809" duration="105000" />
+      <workItem from="1561496467151" duration="3649000" />
+      <workItem from="1561538520932" duration="1215000" />
+      <workItem from="1561673584053" duration="2797000" />
+      <workItem from="1561756299555" duration="962000" />
+      <workItem from="1563235558177" duration="1070000" />
+      <workItem from="1563403609917" duration="964000" />
+      <workItem from="1563404614420" duration="165000" />
+      <workItem from="1563405131918" duration="146000" />
+      <workItem from="1563405541809" duration="442000" />
+      <workItem from="1563406438995" duration="1263000" />
+      <workItem from="1563407809997" duration="80000" />
+      <workItem from="1563407922172" duration="1469000" />
+      <workItem from="1563409692649" duration="2291000" />
+      <workItem from="1563666547508" duration="4406000" />
+      <workItem from="1564008477348" duration="19000" />
+      <workItem from="1591753263251" duration="58000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="2" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="804" y="310" key="FileChooserDialogImpl" timestamp="1591753318233">
+      <screen x="0" y="0" width="2048" height="1112" />
+    </state>
+    <state x="804" y="310" key="FileChooserDialogImpl/0.0.2048.1112@0.0.2048.1112" timestamp="1591753318233" />
+    <state x="525" y="200" key="SettingsEditor" timestamp="1591753302827">
+      <screen x="0" y="0" width="2048" height="1112" />
+    </state>
+    <state x="525" y="200" key="SettingsEditor/0.0.2048.1112@0.0.2048.1112" timestamp="1591753302827" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/plugins/rbsimpdocument.py</url>
+          <line>226</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/plugins/impdata/gwares/impgwares.py</url>
+          <line>53</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/plugins/impdata/gwares/impgwares.py</url>
+          <line>238</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/plugins/checkdir.py</url>
+          <line>38</line>
+          <option name="timeStamp" value="19" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="PythonConfigurationType">
+        <watch expression="obj" language="Python" />
+        <watch expression="wares_units" language="Python" />
+        <watch expression="barcodes" language="Python" />
+        <watch expression="exc" language="Python" />
+        <watch expression="exc.args[0]" language="Python" />
+        <watch expression="sys.exc_value" language="Python" />
+        <watch expression="res['logfilename'].encode('windows-1251').replace('\\', '/')" language="Python" />
+        <watch expression="res['logfilename']" language="Python" />
+        <watch expression="res['name']" language="Python" />
+        <watch expression="Et.fromstring(params_xml)" language="Python" />
+        <watch expression="self.check_dir = self.parser_xml(self.taskparamsxml, 'CheckDir')" language="Python" />
+        <watch expression="(self.check_dir).decode('utf8').replace('','')" language="Python" />
+      </configuration>
+    </watches-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/TASKSERVER$runserver.coverage" NAME="runserver Coverage Results" MODIFIED="1554418067720" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/TS_USR$runserver.coverage" NAME="runserver Coverage Results" MODIFIED="1563668818706" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+  </component>
+  <component name="debuggerHistoryManager">
+    <expressions id="watch">
+      <expression>
+        <expression-string>(self.check_dir).decode('utf8').replace('','')</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>(self.check_dir).decode('utf8').replace()</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>(self.check_dir).decode('utf8')</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>self.check_dir).decode('utf8')</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>bytes(self.check_dir).replace('/','/')</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>bytes(self.check_dir).replace('','')</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>bytes(self.check_dir)</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>self.check_dir.replace('','')</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>self.check_dir.replace()</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>self.check_dir = self.parser_xml(self.taskparamsxml, 'CheckDir')</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+    </expressions>
+  </component>
+</project>

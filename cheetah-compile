@@ -1,0 +1,101 @@
+import os
+import sys
+import re
+
+print sys.argv
+
+from Cheetah.CheetahWrapper import CheetahWrapper
+sys.argv.insert(1, "compile")
+
+def getTmplFilename(filename):    
+    return filename[:-3]+".tmpl"
+
+def getPyFilename(filename):    
+    return filename[:-5]+".py"
+
+def addToTmpl(path):
+  #writing 1-st line in tmpl's
+  count = 0
+  filenames = []
+  reTmplEncoding = re.compile(r"\s*^\s*#encoding cp1251\s*$", re.M)
+  for dirs, subdirs, files in os.walk(path): 
+    for file in files:
+        if file.endswith(".tmpl"):
+            filepath = os.path.join(str(dirs),str(file))
+            if(os.access(filepath,os.F_OK)):
+                f = open(filepath)
+                filetext = f.read()                                
+                f.close()
+                del f
+                #if(filetext.find("#encoding cp1251")==-1):
+                rematch = reTmplEncoding.search(filetext)
+                if rematch is None:
+                    f = open(filepath,'wt')
+                    f.write("#encoding cp1251\n")
+                    f.write(filetext)
+                    f.close()
+                    del f
+                    count += 1
+                    filenames.append(str(file))
+  return count
+
+rePyEncoding = re.compile(r"^\s*#\s*-\*-\s*coding:", re.M)
+def compilefile(dirs,file,count):
+    #writing 2-st line in py's, based on tmpl's
+    #writing 1-nd line in other py's
+    #global count
+    if file.endswith(".py") and str(file)<>"__init__.py":            
+        filepath = os.path.join(dirs, file)
+        tmplfile = getTmplFilename(file)
+        tmplpath = os.path.join(dirs, tmplfile)
+        #no need tmpl exists
+        #if(os.access(filepath,os.F_OK) and os.access(tmplpath,os.F_OK)):
+        f = open(filepath)
+        filetext = f.read()
+        if os.access(filepath,os.F_OK) and os.access(tmplpath,os.F_OK):
+            #has tmpl - insert 2-nd line
+            pos = filetext.find("\n")
+            filemodified = filetext[:(pos+1)]+"# -*- coding: windows-1251 -*-\n"+filetext[(pos+1):]
+        else:
+            #no tmpl - insert 1-st line
+            filemodified = "# -*- coding: windows-1251 -*-\n"+filetext
+        f.close()
+        #if filetext.find("# -*- coding:")==-1:
+        rematch = rePyEncoding.search(filetext)
+        if rematch is None:
+            f = open(filepath,'wt')
+            #f.write("# -*- coding: windows-1251 -*-\n")
+            f.write(filemodified)
+            f.close()
+            count += 1
+        elif filetext.count('\n', 0, rematch.start()) > 1:
+            f = open(filepath,'wt')
+            #f.write("# -*- coding: windows-1251 -*-\n")
+            f.write(filemodified)
+            f.close()
+            count += 1
+    return count
+
+path = os.path.abspath("")
+cnt_tmpl_affected = 0
+print
+if sys.argv[-1][0]=="-":
+    print "Checking tmpl-files..."
+    cnt_tmpl_affected = addToTmpl(path)
+    print "Done"
+print
+CheetahWrapper().main()
+print
+cnt_py_affected = 0
+print "Checking py-files..."
+if sys.argv[-1][0]=="-":
+    for dirs,subdirs,files in os.walk(path):
+        for file in files:
+            cnt_py_affected = compilefile(dirs,file,cnt_py_affected)
+else:
+    cnt_py_affected = compilefile(os.path.dirname(sys.argv[-1]),getPyFilename(os.path.basename(sys.argv[-1])),cnt_py_affected)
+print "Done"
+
+print
+print "Total tmpl-files coding corrected = "+str(cnt_tmpl_affected)
+print "Total py-files coding corrected = "+str(cnt_py_affected)

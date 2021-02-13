@@ -1,0 +1,3 @@
+plugins/ext_api/ecwid/api_ecwid.*
+plugins/impdata/ecwid
+plugins/ext_sync
