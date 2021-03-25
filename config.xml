@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <root>
     <database>
-        <db id="1" ip="127.0.0.1" path="D:/work/ritm-log/DataBase/WMS.GDB" name="USR" db_role="" db_charset="WIN1251"/>
+		<db id="9" ip="109.197.194.109/55050" path="/base/RBS.GDB" name="3Pine" db_role="" db_charset="WIN1251"/>
     </database>
     <globallog value="1"/>
     <globalsleepinterval value="60"/>

@@ -12,7 +12,6 @@ httpagentparser==1.8.1
 
 
 #pip freeze from San Python3.7
-C:\>pip3 freeze
 backports.functools-lru-cache==1.5
 Cheetah3==3.2.0
 cheroot==6.5.4

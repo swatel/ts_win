@@ -1,24 +1,12 @@
-# -*- coding: utf-8 -*-
-
-import os
+# -*- coding: windows-1251 -*-
+version = '0.0.0.0'
 
 import kqkernel as k
+
 import rbsqutils as rqu
-from limbo import limbo
 
-version = '1.0.1.9'
-
-# очистка файлов
-print('cleanup start')
+print('servercode=TS_WIN')
 try:
-    limbo(os.getcwd(), './cleanup.txt')
-    print('cleanup finish')
-except Exception as exc:
-    print('cleanup error', str(exc))
-
-
-print('servercode=TASKSERVER')
-try:
-    a = k.QKernel('USR', 'TASKSERVER')
+    a = k.QKernel('3Pine', 'TS_WIN')
 except:
-    print(rqu.TracebackLog(''))
+    print (rqu.TracebackLog(''))
