@@ -7,56 +7,57 @@ proc1 = select * from WH_FG_PALLETINCOME_PRINT(?,?,?,?,?,?,?,?)
 [html]
 
 html = <div class="label ui-resizable ui-droppable"
-            style="-webkit-transform: rotate(-90deg);position: relative; background-color: white; height: 9.2cm; width: 6.2cm;
-            font-size:  0.146cm; font-family: 'Times New Roman'; text-align: center; top: -1cm; left: 1.35cm;
+            style="-webkit-transform: rotate(0deg); position: relative; background-color: white; height: 15cm; width: 19.5cm;
+            font-size:  0.146cm; font-family: 'Times New Roman'; text-align: center; top: 0.1cm; left: 0.12cm;
 			overflow: hidden;">
     #if ($d1.PFCODE == "GOOD")
-    <div style="height: 0.92cm; width: 0.9cm; top: 0.0cm; left: 5.95cm; font-family: 'Times New Roman'; font-size: 0.92cm; text-align: left; position: absolute; overflow: hidden; border: 1px solid black; text-align: center;"
+    <!-- <div style="height: 0.92cm; width: 0.9cm; top: 0.0cm; left: 5.95cm; font-family: 'Times New Roman'; font-size: 0.92cm; text-align: left; position: absolute; overflow: hidden; border: 1px solid black; text-align: center;"
          class="label ui-resizable ui-droppable ui-draggable">
         <span class="name">Х</span>
-    </div>
+    </div>-->
     #end if
-    <div style="height: 0.3cm; width: 100%; top: 0.023cm; left: 0cm; font-family: 'Times New Roman'; font-size: 0.23cm; text-align: center;
+    <div style="height: 0.7cm; width: 100%; top: 0.1cm; left: 0cm; font-family: 'Times New Roman'; font-size: 0.5cm; text-align: center;
                     position: absolute; overflow: hidden;"
          class="label ui-resizable ui-droppable ui-draggable">
         <span class="name" style="font-weight:900;">Изготовитель: $d1.PRODNAME</span>
     </div>
-    <div style="height: 0.75cm; width: 100%; top: 0.35cm; left: 0cm; font-family: 'Times New Roman'; font-size: 0.17cm; text-align: center;
-        position: absolute; overflow: hidden;" class="label ui-resizable ui-droppable ui-draggable">
-        <span class="name" style="font-weight:900;">Юр.адрес: Россия,Самарская обл.,г.Самара,Заводское шоссе,д.17,оф.61
-        </span><br>
-        <span class="name" style="font-weight:900;">Адрес производства: Россия,Ульяновская обл.,г.Ульяновск,пр-кт Гая,д.95
-        </span>
-	</div>
 
-        <div style="height: 0.6cm; width: 100%; top: 0.85cm; left: 0cm; font-family: impact; font-size: 0.55cm; text-align: center; position: absolute; overflow: hidden;"
+    <div style="height: 1cm; width: 100%; top: 0.7cm; left: 0cm; font-family: 'Times New Roman'; font-size: 0.35cm; text-align: center;
+                    position: absolute; overflow: hidden;"
+         class="label ui-resizable ui-droppable ui-draggable">
+        <span class="name" style="font-weight:900;">Юр.адрес: Россия, Самарская обл., г. Самара, Заводское шоссе, д.17, оф.61</span><br>
+        <span class="name" style="font-weight:900;">Адрес производства: Россия, Ульяновская обл., г. Ульяновск, пр-кт Гая, д.95</span>
+    </div>
+
+        <div style="height: 2cm; width: 100%; top: 1.5cm; left: 0cm; font-family: impact; font-size: 1.4cm; text-align: center; position: absolute; overflow: hidden;"
              class="label ui-resizable ui-droppable ui-draggable">
             <span class="name" style="font-weight:600;text-align: right;">$d1.GCODE</span>
         </div>
 
-    <div style="height: 2.12cm; width: 100%; top: 1.45cm; left: 0cm; /*font-family: impact;*/ font-size: 0.46cm;
-                text-align: center; position: absolute; overflow: hidden; line-height: 0.53cm;"
+    <div style="height: 4.5cm; width: 100%; top: 3cm; left: 0cm; /*font-family: impact;*/ font-size: 0.9cm;
+                text-align: center; position: absolute; overflow: hidden; line-height: 0.85cm;"
          class="label ui-resizable ui-droppable ui-draggable">
         <span class="name" style="font-weight:500;text-align: right;">$d1.GNAME</span>
     </div>
-    <div style="height: 0.3cm; width: 100%; top: 3.4cm; left: 0cm; font-family: 'Times New Roman'; font-size: 0.18cm; text-align: center;
+
+    <div style="height: 0.5cm; width: 100%; top: 5.5cm; left: 0cm; font-family: 'Times New Roman'; font-size: 0.35cm; text-align: center;
                     position: absolute; overflow: hidden;"
          class="label ui-resizable ui-droppable ui-draggable">
         <span class="name" style="font-weight:900;">Хранить при температуре +2&deg;С +20&deg;С в затемненном помещении.</span>
     </div>
-    <div style="height: 1.35cm; width: 100%; top: 3.7cm; left: 0cm; font-family: impact; font-size: 0.05cm;
+    <div style="height: 2.4cm; width: 100%; top: 5.9cm; left: 0cm; font-family: impact; font-size: 0.05cm;
                 text-align: left; position: absolute; overflow: hidden; border-top: 1px solid #000000;
                 border-bottom: 1px solid #000000"
          class="label ui-resizable ui-droppable ui-draggable">
-        <div style="font-size: 0.32cm">
+        <div style="font-size: 0.5cm">
             <span class="name" style="font-weight:normal;text-align: right;">№</span>
         </div>
-        <div style="text-align: left; font-size: 1.2cm; position: relative; top: -0.5cm; left: 0.4cm;">
+        <div style="text-align: center; font-size: 1.8cm; position: relative; top: -0.5cm;">
             <span class="name" style="font-weight:900;text-align: right;">$d1.PNUMBER</span>
         </div>
         #if ($d1.PFCODE)
-            <div style="height: 100%; width: 1.4cm; position: absolute; top: 0; left: 4.35cm;
-                        font-family: 'Times New Roman'; font-size: 0.4cm; line-height: 1.1; word-wrap: break-word;
+            <div style="height: 100%; width: 3.8cm; position: absolute; top: 0; left: 15.35cm;
+                        font-family: 'Times New Roman'; font-size: 0.7cm; line-height: 1.1; word-wrap: break-word;
                         padding-left: 0.2cm; padding-right: 0.2cm; text-align: center; overflow: hidden; border-left: 1px solid black;"
                  class="label ui-resizable ui-droppable ui-draggable">
                 <span class="name">$d1.PFCODE</span>
@@ -64,7 +65,7 @@ html = <div class="label ui-resizable ui-droppable"
         #end if
     </div>
 
-    <div style="height: 1.2cm; width: 100%; top: 5.05cm; left: 0cm; font-family: impact; font-size: 0.3cm; font-weight: 900;
+    <div style="height: 2cm; width: 100%; top: 8.4cm; left: 0cm; font-family: impact; font-size: 0.5cm; font-weight: 900;
                 text-align: left; position: absolute; overflow: hidden; border-top: 0px solid #000000;
                 border-bottom: 0px solid #000000"
          class="label ui-resizable ui-droppable ui-draggable">
@@ -76,12 +77,12 @@ html = <div class="label ui-resizable ui-droppable"
                 <span class="name" style="font-weight:normal;text-align: right;">Количество:</span>
             </div>
         </div>
-        <div style="font-size: 0.46cm">
-            <div style="padding-left: 0.05cm; text-align: left; width: 60%; overflow: hidden; position: absolute; top: 0.32cm; ">
+        <div style="font-size: 0.9cm">
+            <div style="padding-left: 0.05cm; text-align: left; width: 60%; overflow: hidden; position: absolute; top: 0.85cm; ">
                 <span style="font-weight:normal;text-align: right;">$d1.GBARCODE</span>
             </div>
-            <div style="width: 40%; overflow: hidden; position: absolute; top: 0.32cm; left: 60%; text-align: left;">
-                <span class="name" style="font-weight:normal;text-align: right;font-size: 0.3cm;">
+            <div style="width: 40%; overflow: hidden; position: absolute; top: 0.85cm; left: 60%; text-align: left;">
+                <span class="name" style="font-weight:normal;text-align: right;">
                     #set $v = '%d' % ($d1.QUANTITY)
                     #set $fv = '%d' % ($d1.FQUANTITY)
                     #set $suc =  $d1.SUCODE
@@ -95,33 +96,33 @@ html = <div class="label ui-resizable ui-droppable"
             </div>
         </div>
     </div>
-    <div style="height: 0.92cm; width: 100%; top: 5.95cm; left: 0cm; font-family: impact; font-size: 0.276cm; 
+    <div style="height: 1.5cm; width: 100%; top: 10.4cm; left: 0cm; font-family: impact; font-size: 0.276cm;
                 text-align: center; position: absolute; overflow: hidden; border-top: 1px solid #000000;
                 border-bottom: 1px solid #000000"
          class="label ui-resizable ui-droppable ui-draggable">
-        <div style="left: 0cm; width: 25%; font-size: 0.2cm;  position: absolute; overflow: hidden;
-                    border-right: 2px solid #000000; height: 0.92cm; padding-top: 0.1cm;">
+        <div style="left: 0cm; width: 25%; font-size: 0.4cm;  position: absolute; overflow: hidden;
+                    border-right: 2px solid #000000; height: 1.5cm; padding-top: 0.1cm;">
             <span class="name" style="font-weight:normal;text-align: center;">Дата произв.:</span><br>
-            <span class="name" style="font-weight:normal;text-align: center; font-size: 0.37cm;">
+            <span class="name" style="font-weight:normal;text-align: center; font-size: 0.6cm;">
                 #from rbsqutils import formatMxDateTime
 	            $formatMxDateTime($d1.PRODUCTDATE, format="%d/%m/%y")
             </span>
         </div>
-        <div style="left: 25%; width: 25%; font-size: 0.2cm;  position: absolute; overflow: hidden; text-align: center;
-                    border-right: 1px solid #000000; height: 0.92cm; padding-top: 0.1cm;">
+        <div style="left: 25%; width: 25%; font-size: 0.4cm;  position: absolute; overflow: hidden; text-align: center;
+                    border-right: 1px solid #000000; height: 1.5cm; padding-top: 0.1cm;">
             <span class="name" style="font-weight:normal;text-align: center;">Годен до:</span><br>
-            <span class="name" style="font-weight:normal;text-align: center; font-size: 0.37cm;">
+            <span class="name" style="font-weight:normal;text-align: center; font-size: 0.6cm;">
                 #from rbsqutils import formatMxDateTime
 	            $formatMxDateTime($d1.BESTBEFOREDATE, format="%d/%m/%y")
             </span>
         </div>
-        <div style="left: 50%; width: 25%; font-size: 0.2cm;  position: absolute; overflow: hidden; text-align: center;
-                    /*display: none;*/border-right: 2px solid #000000; height: 0.92cm; padding-top: 0.1cm;">
+        <div style="left: 50%; width: 25%; font-size: 0.4cm;  position: absolute; overflow: hidden; text-align: center;
+                    /*display: none;*/border-right: 2px solid #000000; height: 1.5cm; padding-top: 0.1cm;">
             <span class="name" style="font-weight:normal;text-align: right;">Заказ No:</span><br>
         </div>
-        <div style="left: 75%; width: 25%; font-size: 0.2cm;  position: absolute; overflow: hidden; text-align: center;  height: 0.92cm; padding-top: 0.1cm;">
+        <div style="left: 75%; width: 25%; font-size: 0.4cm;  position: absolute; overflow: hidden; text-align: center;  height: 1.5cm; padding-top: 0.1cm;">
             <span class="name" style="font-weight:normal;text-align: right;">Брутто(кг):</span><br>
-            <span class="name" style="font-weight:normal;text-align: right; font-size: 0.4cm">$d1.WEIGHT</span>
+            <span class="name" style="font-weight:normal;text-align: right; font-size: 0.6cm">$d1.WEIGHT</span>
         </div>
         <!--<div style="padding-left: 0.1cm; text-align: left; width: 1.5cm; position: absolute; overflow: hidden;
                     top: 0.276cm; font-size: 0.33cm">
@@ -129,16 +130,16 @@ html = <div class="label ui-resizable ui-droppable"
                 </span>
         </div>-->
     </div>
-    <div id='barcodeTargetBefore' style="height: 1.84cm; width: 100%; top: 7.26cm; text-align: center; position: absolute; overflow: hidden;"
+    <div id='barcodeTargetBefore' style="height: 2.7cm; width: 100%; top: 12.15cm; text-align: center; position: absolute; overflow: hidden;"
          class="label ui-resizable ui-droppable ui-draggable">
          <div id='barcodeTarget'></div>
     </div>
     #if $d1.PNUM
-        <div style="height: 0.2cm; width: 100%; top: 9.38cm; left: 0cm; font-family: 'Times New Roman'; font-size: 0.2cm; text-align: right; position: absolute; overflow: hidden;"
+       <!-- <div style="height: 0.2cm; width: 100%; top: 9.38cm; left: 0cm; font-family: 'Times New Roman'; font-size: 0.2cm; text-align: right; position: absolute; overflow: hidden;"
              class="label ui-resizable ui-droppable ui-draggable">
             <div style="width: 2.5cm; text-align: left; position: absolute; left: 0.65cm;"><span class="name" style="font-weight:bold;">$d1.SNAME</span></div>
             <div style="width: 3cm; text-align: right; position: absolute; left: 3cm;"><span class="name" style="font-weight:bold;">№$d1.PNUM</span></div>
-        </div>
+        </div>-->
     #end if
   </div>
     <script type="text/javascript" src="/engineU3S/systems/TASKSERVER/report/prototype.js"></script>
@@ -146,7 +147,7 @@ html = <div class="label ui-resizable ui-droppable"
     <script type="text/javascript">
         \$('barcodeTarget').barcode("$d1.PBARCODE",'code128',{barWidth: '2', barHeight: '120', fontSize: '23', showHRI: false});
         \$('barcodeTarget').style.overflow = 'hidden';
-        \$('barcodeTarget').style["padding-left"] = (\$('barcodeTargetBefore').offsetWidth - \$('barcodeTarget').offsetWidth) / 2;        
+        \$('barcodeTarget').style["padding-left"] = (\$('barcodeTargetBefore').offsetWidth - \$('barcodeTarget').offsetWidth) / 2;       
     </script>
 
 [ProcDataList]
@@ -156,8 +157,8 @@ proc1 = d1
 proc1 = one
 
 [Dimension]
-width = 100
-height = 100
+width = 205
+height = 159
 
 [Margin]
 top = 0

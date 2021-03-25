@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
+# -*- coding: cp1251-*
 """
     24.03.2015
-    Р”РµРєРѕСЂР°С‚РѕСЂС‹
+    Декораторы
 """
 
 from datetime import datetime
@@ -10,12 +10,12 @@ import krconst as c
 
 def timer_sql(func):
     """
-        Р”РµРєРѕСЂР°С‚РѕРІ РІС‹РїРѕР»РЅРµРЅРёСЏ Р·Р°РїСЂРѕСЃРѕРІ РґР»СЏ Р±Р°Р·РѕРІРѕРіРѕ РїР»Р°РіРёРЅР°
+        Декоратов выполнения запросов для базового плагина
     """
 
     def tmp(*args, **kwargs):
         """
-            РћР±РµСЂС‚РєР°
+            Обертка
         """
 
         base_plugin = args[0]
@@ -28,12 +28,7 @@ def timer_sql(func):
                 sqlparams = kwargs['sql_params']
             except KeyError:
                 sqlparams = ''
-            try:
-                sql_text = kwargs['sql_text']
-            except:
-                sql_text = args[1]
-
-            text = c.sql_timer % {'sql': sql_text,
+            text = c.sql_timer % {'sql': args[1],
                                   'sqlparams': sqlparams,
                                   'delta_date_start_sql': delta_date_start_sql}
             base_plugin.log_file(text + c.kr_term_enter)
@@ -43,14 +38,14 @@ def timer_sql(func):
 
 def timer(func):
     """
-        Р”РµРєРѕСЂР°С‚ РёР·РјРµСЂРµРЅРёСЏ РІСЂРµРјРµРЅРё РІС‹РїРѕР»РЅРµРЅРёСЏ РјРµС‚РѕРґР° РїР»Р°РіРёРЅР°
-        (РёР»Рё РєР»Р°СЃСЃР°, Сѓ РєРѕС‚РѕСЂРѕРіРѕ РµСЃС‚СЊ self.parent_obj, СѓРєР°Р·С‹РІР°СЋС‰РёР№ РЅР° РїР»Р°РіРёРЅ)
+        Декорат измерения времени выполнения метода плагина
+        (или класса, у которого есть self.parent_obj, указывающий на плагин)
     """
     import BasePlugin as bp
 
     def tmp(*args, **kwargs):
         """
-            РћР±РµСЂС‚РєР°
+            Обертка
         """
         _self = args[0]
         base_plugin = None

@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: windows-1251 -*-
 # coding=utf-8
 
 import pyodbc
@@ -257,7 +257,7 @@ class Mssql(object):
                     return {'status': 3, 'message': db_local.db_message, 'datalist': None}
                 else:
                     return {'status': 1, 'message': None, 'datalist': res}
-            except Exception as exc:
+            except Exception, exc:
                 self.result = 2
                 error = 'Error execute SQL in MSSQL command: %(sql)s %(sqlparams)s, %(err)s'\
                         % {'sql': sql_text, 'sqlparams': sqlparams, 'err': db_local.db_message}

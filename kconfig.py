@@ -1,19 +1,18 @@
-# -*- coding: utf-8 -*-
+# -*- coding: cp1251-*
 """
-    РњРѕРґСѓР»СЊ РЅР°С‡Р°Р»СЊРЅРѕР№ РєРѕРЅС„РёРіСѓСЂР°С†РёРё СЃРµСЂРІРµСЂ-Р·Р°РґР°С‡
+    Модуль начальной конфигурации сервер-задач
 """
 
 import os
 import sys
-import xml.etree.ElementTree as Et
-# import elementtree.ElementTree as Et
+import elementtree.ElementTree as Et
 
 import krconst as c
 
 
 class KConfig(object):
     """
-        РљР»Р°СЃСЃ РЅР°С‡Р°Р»СЊРЅРѕР№ РєРѕРЅС„РёРіСѓСЂР°С†РёРё СЃРµСЂРІРµСЂ-Р·Р°РґР°С‡
+        Класс начальной конфигурации сервер-задач
     """
 
     def __init__(self, name_db):
@@ -29,18 +28,18 @@ class KConfig(object):
         self.db_pass = None
         self.db_list = {}
 
-        ''' РџР°СЂР°РјРµС‚СЂС‹ РїРµСЂРµСЂС‹РІР° '''
+        ''' Параметры перерыва '''
         self.break_params = {}
 
-        ''' РЎС‚Р°С‚СѓСЃ СЃРµСЂРІРµСЂР°-Р·Р°РґР°С‡ '''
+        ''' Статус сервера-задач '''
         self.status_config = c.kr_status_config_ok
         self.status_config_message = ''
         self.status_server_queue = None
 
-        ''' Р¤Р»Р°Рі РїРѕС‚РµСЂРё РєРѕРЅРЅРµРєС‚Р° '''
+        ''' Флаг потери коннекта '''
         self.LostConnectDB = None
 
-        ''' Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹ '''
+        ''' Глобальные параметры '''
         self.global_log = None
         self.global_sleep_interval = None
         self.global_def_dir_tmp_files = None
@@ -51,11 +50,11 @@ class KConfig(object):
         self.global_def_dir_tmp_clear_interval = None
         self.engine_dir_files = None
 
-        ''' РџР°СЂР°РјРµС‚СЂС‹ РћРЎ '''
+        ''' Параметры ОС '''
         self.os_version = None
         self.os_platform = None
 
-        ''' РїР°СЂР°РјРµС‚СЂС‹ РґР»СЏ СЂР°Р±РѕС‚С‹ СЃРѕ СЃР»РѕСЏРјРё '''
+        ''' параметры для работы со слоями '''
         self.layers_work = False
         self.layers_engine_db = None
         self.layers_code = None
@@ -63,7 +62,7 @@ class KConfig(object):
 
     def get_config_file(self):
         """
-            РџРѕР»СѓС‡РµРЅРёРµ С„Р°Р№Р»Р° РєРѕРЅС„РёРіСѓСЂР°С†РёРё
+            Получение файла конфигурации
         """
 
         if not os.access(self.file_name_config, os.F_OK):
@@ -80,7 +79,7 @@ class KConfig(object):
 
     def get_config_layer(self):
         """
-            РџРѕР»СѓС‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ СЂР°Р±РѕС‚С‹ СЃРѕ СЃР»РѕСЏРјРё
+            Получение параметров работы со слоями
         """
 
         if self.xml_cfg:
@@ -88,21 +87,21 @@ class KConfig(object):
 
     def get_db_by_attr(self, root, attrib, value):
         """
-            РџРѕР»СѓС‡РµРЅРёРµ Р°С‚СЂРёР±СѓС‚Р°
+            Получение атрибута
         """
 
         return root.find(".//db[@" + attrib + "='" + value + "']")
 
     def get_config(self, layer_code='', layer_conf=None):
         """
-            РџРѕР»СѓС‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ СЂР°Р±РѕС‚С‹ СЃРµСЂРІРµСЂР°-Р·Р°РґР°С‡
+            Получение параметров работы сервера-задач
         """
 
         if self.xml_cfg:
             self.global_def_dir_tmp_files = self.xml_cfg.find("globaldefdirtmpfiles").attrib["value"]
             if layer_conf:
                 try:
-                    # os.sep РІ РєРѕРЅС†Рµ РѕР±СЏР·Р°С‚РµР»РµРЅ - РґР»СЏ РЅРµРєРѕС‚РѕСЂС‹С… РїР»Р°РіРёРЅРѕРІ РєСЂРёС‚РёС‡РЅРѕ (РЅР°РїСЂРёРјРµСЂ checkdir)
+                    # os.sep в конце обязателен - для некоторых плагинов критично (например checkdir)
                     self.global_def_dir_tmp_files = os.path.join(self.global_def_dir_tmp_files, layer_code) + os.sep
                     self.db_ip = layer_conf.db_ip
                     dbs_storage = self.xml_cfg.find("dbs_storage").attrib["value"]
@@ -151,7 +150,7 @@ class KConfig(object):
 
     def get_os_version(self):
         """
-            РџРѕР»СѓС‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ РћРЎ РЅР° РєРѕС‚РѕСЂРѕР№ СЂР°Р±РѕС‚Р°РµС‚ СЃРµСЂРІРµСЂ-Р·Р°РґР°С‡
+            Получение параметров ОС на которой работает сервер-задач
         """
 
         import platform

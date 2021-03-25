@@ -1,16 +1,16 @@
-# -*- coding: utf-8 -*-
+# -*- coding: cp1251-*
 import contextlib
 
 
 @contextlib.contextmanager
 def std_capture():
     """
-    РџРµСЂРµС…РІР°С‚ СЃС‚Р°РЅРґР°СЂС‚РЅРѕРіРѕ РІС‹РІРѕРґР° Рё РѕС€РёР±РѕРє
-    :return: list [0] - СЃРѕРґРµСЂР¶РёРјРѕРµ stdout
-             list [1] - СЃРѕРґРµСЂР¶РёРјРѕРµ stderr
+    Перехват стандартного вывода и ошибок
+    :return: list [0] - содержимое stdout
+             list [1] - содержимое stderr
     """
     import sys
-    from io import StringIO
+    from cStringIO import StringIO
     oldout, olderr = sys.stdout, sys.stderr
     try:
         out = [StringIO(), StringIO()]
@@ -24,60 +24,60 @@ def std_capture():
 
 def pip_check(package, transport, install=False):
     """
-    РџСЂРѕРІРµСЂРєР° РЅР° СЃСѓС‰РµСЃС‚РІРѕРІР°РЅРёРµ РјРѕРґСѓР»СЏ, РµСЃР»Рё РЅРµС‚ - С‚Рѕ РїРѕРїС‹С‚РєР° СѓСЃС‚Р°РЅРѕРІРёС‚СЊ С‡РµСЂРµР· pip
-    :param package: РРјСЏ РјРѕРґСѓР»СЏ
-    :param transport: РўСЂР°РЅСЃРїРѕСЂС‚РЅС‹Р№ РјРѕРґСѓР»СЊ, РґР»СЏ Р¶СѓСЂРЅР°Р»РёСЂРѕРІР°РЅРёСЏ
-    :param install: РЈСЃС‚Р°РЅР°РІР»РёРІР°С‚СЊ, РµСЃР»Рё РЅРµ РЅР°Р№РґРµРЅ
+    Проверка на существование модуля, если нет - то попытка установить через pip
+    :param package: Имя модуля
+    :param transport: Транспортный модуль, для журналирования
+    :param install: Устанавливать, если не найден
     :return: Boolean
     """
     import imp
     try:
         imp.find_module(package)
-        return True  # РњРѕРґСѓР»СЊ РµСЃС‚СЊ - РІС‹С…РѕРґРёРј
+        return True  # Модуль есть - выходим
     except ImportError:
-        transport.log_file('РњРѕРґСѓР»СЊ ' + package + ' РЅРµ РЅР°Р№РґРµРЅ')
-        if not install:  # Р•СЃР»Рё РЅРµ РїС‹С‚Р°С‚СЊСЃСЏ СѓСЃС‚Р°РЅР°РІР»РёРІР°С‚СЊ - РІС‹С…РѕРґ
+        transport.log_file('Модуль ' + package + ' не найден')
+        if not install:  # Если не пытаться устанавливать - выход
             return False
-    transport.log_file('РџРѕРїС‹С‚РєР° СѓСЃС‚Р°РЅРѕРІРёС‚СЊ С‡РµСЂРµР· pip')
-    # РЈСЃС‚Р°РЅРѕРІРёРј/РѕР±РЅРѕРІРёРј pip С‡РµСЂРµР· easy_install
-    # Р•СЃР»Рё СЃРґРµР»Р°С‚СЊ РѕР±РЅРѕРІР»РµРЅРёРµ РїРѕСЃР»Рµ imp.find_module('pip') - Р±СѓРґРµС‚ СЂР°Р±РѕС‚Р°С‚СЊ СЃС‚Р°СЂР°СЏ РІРµСЂСЃРёСЏ
+    transport.log_file('Попытка установить через pip')
+    # Установим/обновим pip через easy_install
+    # Если сделать обновление после imp.find_module('pip') - будет работать старая версия
     try:
         from setuptools.command import easy_install
         easy_install.main(['-U', 'pip'])
     except:
-        transport.log_file('РќРµ СѓРґР°Р»РѕСЃСЊ СѓСЃС‚Р°РЅРѕРІРёС‚СЊ/РѕР±РЅРѕРІРёС‚СЊ pip', 0, 'ERROR')
+        transport.log_file('Не удалось установить/обновить pip', 0, 'ERROR')
         return False
-    # РњРѕРґСѓР»СЊ РЅРµ РЅР°С€Р»Рё, РїС‹С‚Р°РµРјСЃСЏ СѓСЃС‚Р°РЅРѕРІРёС‚СЊ
+    # Модуль не нашли, пытаемся установить
     try:
         imp.find_module('pip')
     except ImportError:
-        transport.log_file('РќРµ РЅР°Р№РґРµРЅ pip', 0, 'ERROR')
+        transport.log_file('Не найден pip', 0, 'ERROR')
         return False
-    # РџСЂРѕР±СѓРµРј СѓСЃС‚Р°РЅРѕРІРёС‚СЊ, pip СѓР¶Рµ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ
+    # Пробуем установить, pip уже должен быть
     try:
         import pip, sys
-        # РџРµСЂРµС…РІР°С‚С‹РІР°РµРј СЃС‚Р°РЅРґР°СЂС‚РЅС‹Р№ РІС‹РІРѕРґ Рё РѕС€РёР±РєРё
+        # Перехватываем стандартный вывод и ошибки
         with std_capture() as out:
             res = pip.main(['install', package])
         if res != 0:
             message = out[0]
             error_message = out[1]
             import os
-            transport.log_file('РќРµ СѓРґР°Р»РѕСЃСЊ СѓСЃС‚Р°РЅРѕРІРёС‚СЊ РјРѕРґСѓР»СЊ ' + package, 0, 'ERROR')
+            transport.log_file('Не удалось установить модуль ' + package, 0, 'ERROR')
             if error_message:
                 transport.log_file(error_message, 0, 'ERROR')
             if message:
                 transport.log_file(message)
             return False
         else:
-            transport.log_file('РњРѕРґСѓР»СЊ ' + package + ' СѓСЃС‚Р°РЅРѕРІР»РµРЅ')
+            transport.log_file('Модуль ' + package + ' установлен')
     except:
-        transport.log_file('РќРµ СѓРґР°Р»РѕСЃСЊ СѓСЃС‚Р°РЅРѕРІРёС‚СЊ РјРѕРґСѓР»СЊ ' + package, 0, 'ERROR')
+        transport.log_file('Не удалось установить модуль ' + package, 0, 'ERROR')
         return False
-    # РџРѕСЃР»РµРґРЅСЏСЏ РїРѕРїС‹С‚РєР° Р·Р°РіСЂСѓР·РёС‚СЊ РјРѕРґСѓР»СЊ
+    # Последняя попытка загрузить модуль
     try:
         imp.find_module(package)
-        return True  # РњРѕРґСѓР»СЊ РµСЃС‚СЊ - РІС‹С…РѕРґРёРј
+        return True  # Модуль есть - выходим
     except ImportError:
-        transport.log_file('РњРѕРґСѓР»СЊ ' + package + ' РЅРµ РЅР°Р№РґРµРЅ', 0, 'ERROR')
+        transport.log_file('Модуль ' + package + ' не найден', 0, 'ERROR')
         return False

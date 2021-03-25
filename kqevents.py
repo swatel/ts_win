@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: cp1251-*
 
 import threading
 
@@ -25,5 +25,5 @@ class FBEventThread(threading.Thread):
             conduit.wait()
             try:
                 self.event_callback()
-            except Exception as e:
-                print('Event callback exception: ' + e.message)
+            except Exception, e:
+                print 'Event callback exception: ' + e.message

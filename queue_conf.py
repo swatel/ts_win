@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: cp1251-*
 db_ip = '127.0.0.1/3052'
 #db_path='D:\work\DataBase\web\pole_wms.gdb'
 #db_path='D:\base\pole_wms.gdb'

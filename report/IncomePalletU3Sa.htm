@@ -1,0 +1,126 @@
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"></head>
+<body>
+  <div class="label ui-resizable ui-droppable"
+            style="position: relative; background-color: white; height: 10cm; width: 7cm; font-size: 0.146cm;
+                    font-family: 'Times New Roman'; text-align: center; top: 0.0cm; left: 0.0cm;">
+    #if ($d1.PFCODE == "GOOD")
+    <div style="height: 0.92cm; width: 1cm; top: 0.0cm; left: 5.95cm; font-family: 'Times New Roman'; font-size: 0.92cm; text-align: left; position: absolute; overflow: hidden; border: 1px solid black; text-align: center;"
+         class="label ui-resizable ui-droppable ui-draggable">
+        <span class="name">Х</span>
+    </div>
+    #end if
+    <div style="height: 0.3cm; width: 6cm; top: 0.023cm; left: 0cm; font-family: 'Times New Roman'; font-size: 0.23cm; text-align: center;
+                    position: absolute; overflow: hidden;"
+         class="label ui-resizable ui-droppable ui-draggable">
+        <span class="name" style="font-weight:900;">$d1.PRODNAME</span>
+    </div>
+
+        <div style="height: 0.6cm; width: 6cm; top: 0.368cm; left: 0cm; font-family: impact; font-size: 0.55cm; text-align: center; position: absolute; overflow: hidden;"
+             class="label ui-resizable ui-droppable ui-draggable">
+            <span class="name" style="font-weight:600;text-align: right;">$d1.GCODE</span>
+        </div>
+
+    <div style="height: 2.12cm; width: 7cm; top: 1.15cm; left: 0cm; /*font-family: impact;*/ font-size: 0.46cm;
+                text-align: center; position: absolute; overflow: hidden; line-height: 0.53cm;"
+         class="label ui-resizable ui-droppable ui-draggable">
+        <span class="name" style="font-weight:500;text-align: right;">$d1.GNAME</span>
+    </div>
+    <div style="height: 1.49cm; width: 7cm; top: 3.37cm; left: 0cm; font-family: impact; font-size: 0.05cm;
+                text-align: left; position: absolute; overflow: hidden; border-top: 1px solid #000000;
+                border-bottom: 1px solid #000000"
+         class="label ui-resizable ui-droppable ui-draggable">
+        <div style="font-size: 0.32cm">
+            <span class="name" style="font-weight:normal;text-align: right;">SSCC:</span>
+        </div>
+        <div style="text-align: center; font-size: 0.65cm">
+            <span class="name" style="font-weight:normal;text-align: right;">$d1.PNUMBER</span>
+        </div>
+    </div>
+
+    <div style="height: 2.4cm; width: 7cm; top: 4.84cm; left: 0cm; font-family: impact; font-size: 0.3cm; font-weight: 900;
+                text-align: left; position: absolute; overflow: hidden; border-top: 0px solid #000000;
+                border-bottom: 0px solid #000000"
+         class="label ui-resizable ui-droppable ui-draggable">
+        <div>
+            <div style="width: 5.3cm; overflow: hidden; float: left;">
+                <span class="name" style="font-weight:normal;text-align: right;">Продукт EAN:</span>
+            </div>
+            <div style="width: 1.7cm; overflow: hidden;">
+                <span class="name" style="font-weight:normal;text-align: right;">Количество:</span>
+            </div>
+        </div>
+        <div style="font-size: 0.46cm">
+            <div style="padding-left: 0.05cm; text-align: left; width: 5.3cm; overflow: hidden; position: absolute; top: 0.32cm; ">
+                <span style="font-weight:normal;text-align: right;">$d1.GBARCODE</span>
+            </div>
+            <div style="width: 1.65cm; overflow: hidden; position: absolute; top: 0.32cm; left: 5.3cm; ">
+                <span class="name" style="font-weight:normal;text-align: right;">
+                    #set $v = '%d' % ($d1.QUANTITY)
+                    $v
+                </span>
+            </div>
+        </div>
+    </div>
+    <div style="height: 0.92cm; width: 7cm; top: 5.95cm; left: 0cm; font-family: impact; font-size: 0.276cm;
+                text-align: left; position: absolute; overflow: hidden; border-top: 1px solid #000000;
+                border-bottom: 1px solid #000000"
+         class="label ui-resizable ui-droppable ui-draggable">
+        <div style="left: 0cm; width: 1.7cm; font-size: 0.2cm;  position: absolute; overflow: hidden;
+                    border-right: 2px solid #000000; height: 0.92cm; padding-top: 0.1cm;">
+            <span class="name" style="font-weight:normal;text-align: right;">Дата произв.:</span><br>
+            <span class="name" style="font-weight:normal;text-align: right; font-size: 0.4cm;">
+                #from rbsqutils import formatMxDateTime
+	            $formatMxDateTime($d1.PRODUCTDATE, format="%d/%m/%y")
+            </span>
+        </div>
+        <div style="left: 1.85cm; width: 1.75cm; font-size: 0.2cm;  position: absolute; overflow: hidden;
+                    border-right: 1px solid #000000; height: 0.92cm; padding-top: 0.1cm;">
+            <span class="name" style="font-weight:normal;text-align: right;">Годен до:</span><br>
+            <span class="name" style="font-weight:normal;text-align: right; font-size: 0.43cm;">
+                #from rbsqutils import formatMxDateTime
+	            $formatMxDateTime($d1.BESTBEFOREDATE, format="%d/%m/%y")
+            </span>
+        </div>
+        <div style="left: 3.6cm; width: 1.72cm; font-size: 0.2cm;  position: absolute; overflow: hidden; text-align: center;
+                    /*display: none;*/border-right: 2px solid #000000; height: 0.92cm; padding-top: 0.1cm;">
+            <span class="name" style="font-weight:normal;text-align: right;">Заказ No:</span><br>
+        </div>
+        <div style="left: 5.35cm; width: 1.65cm; font-size: 0.2cm;  position: absolute; overflow: hidden; text-align: center;  height: 0.92cm;">
+            <span class="name" style="font-weight:normal;text-align: right;">Брутто(кг):</span><br>
+            <span class="name" style="font-weight:normal;text-align: right; font-size: 0.43cm">$d1.WEIGHT</span>
+        </div>
+        <div style="padding-left: 0.1cm; text-align: left; width: 1.5cm; position: absolute; overflow: hidden;
+                    top: 0.276cm; font-size: 0.33cm">
+            <span style="font-weight:normal;text-align: right;">
+                </span>
+        </div>
+    </div>
+    <div id='barcodeTarget' style="height: 1.84cm; width: 7cm; top: 7.26cm; left: 0.1cm; text-align: center; position: absolute; overflow: hidden;"
+         class="label ui-resizable ui-droppable ui-draggable">
+    </div>
+    #if $d1.PNUM
+        <div style="height: 0.2cm; width: 7cm; top: 9.38cm; left: 0cm; font-family: 'Times New Roman'; font-size: 0.2cm; text-align: right; position: absolute; overflow: hidden;"
+             class="label ui-resizable ui-droppable ui-draggable">
+            <div style="width: 2.5cm; text-align: left; position: absolute; left: 0.65cm;"><span class="name" style="font-weight:bold;">$d1.SNAME</span></div>
+            <div style="width: 3cm; text-align: right; position: absolute; left: 3cm;"><span class="name" style="font-weight:bold;">№$d1.PNUM</span></div>
+        </div>
+    #end if
+    <div style="; display: none;height: 0.16cm; width: 0.6cm; top: 6.89cm; left: 1.25cm; font-family: 'Times New Roman'; font-size: 0.11cm; text-align: center; position: absolute; overflow: hidden;"
+         class="label ui-resizable ui-droppable ui-draggable">
+	<span class="name">
+	#if $d1.DETAIL >= 1
+        Копия
+	#end if
+	</span>
+	</div>
+	<div style="; display: none;height: 0.16cm; width: 1.25cm; top: 6.89cm; left: 0cm; font-family: 'Times New Roman'; font-size: 0.11cm; text-align: center; position: absolute; overflow: hidden;" class="label ui-resizable ui-droppable ui-draggable">
+	<span class="name" style="font-weight:bold;">
+	#from time import gmtime, strftime
+	$strftime("%d.%m.%Y %H:%M:%S", $gmtime())
+	</span>
+	</div>
+  </div>
+</body>
+</html>

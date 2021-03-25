@@ -1,0 +1,53 @@
+[ProcParams]
+proc1 = ManID,PalletID
+
+[ProcNames]
+proc1 = select * from WH_PRINT_COMERETURNPALBARCODE(?,?)
+
+[html]
+html = <div class="label ui-resizable ui-droppable" style="-webkit-transform: rotate(90deg);position: relative; background-color: white; height: 9.5cm; width: 6.8cm; font-size: 0.3174603174603175cm; font-family: 'Times New Roman'; text-align: center; top: -1.35cm; left: 1.35cm;">
+            <div style="height: 0.8cm; width: 6.8cm; top: 0.5cm; left: 0cm; font-family: 'Times New Roman'; font-size: 0.45cm; text-align: center; position: absolute; overflow: hidden;" class="label ui-resizable ui-droppable ui-draggable">
+                <span class="name" style="font-weight:bold;">$d1.ZONENAME</span>
+            </div>
+            <div style="height: 4.1cm; width: 6.8cm; top: 0.2cm; left: -0.1cm; font-family: 'impact'; font-size: 3.8cm; text-align: center; position: absolute; overflow: hidden;" class="label ui-resizable ui-droppable ui-draggable">
+                <span class="name" style="font-weight:200;text-align: right;">$d1.NUM1</span>
+            </div>
+			<div id='barcodeTargetBefore' style="height: 2.724867724867725cm; width: 6.8cm; top: 4.3cm; left: 0cm; text-align: center; position: absolute; overflow: hidden;"
+				 class="label ui-resizable ui-droppable ui-draggable">
+				 <div id='barcodeTarget'></div>
+			</div>			
+            <div style="height: 4.1cm; width: 6.8cm; top: 5.05cm; left: -0.1cm; font-family: 'impact'; font-size: 3.8cm; text-align: center; position: absolute; overflow: hidden;" class="label ui-resizable ui-droppable ui-draggable">
+                <span class="name" style="font-weight:200;text-align: right;">$d1.NUM2</span>
+            </div>
+            <div style="height: 0.35cm; width: 3cm; top: 9cm; left: 3.7cm; font-family: 'Times New Roman'; font-size: 0.25cm; text-align: right; position: absolute; overflow: hidden;" class="label ui-resizable ui-droppable ui-draggable">
+                <span class="name" style="font-weight:bold;">$d1.EMPLNAME</span>
+            </div>
+            <div style="height: 0.35cm; width: 1.2cm; top: 9cm; left: 2.5cm; font-family: 'Times New Roman'; font-size: 0.25cm; text-align: center; position: absolute; overflow: hidden;" class="label ui-resizable ui-droppable ui-draggable">
+                <span class="name">
+                    #if $d1.DETAIL >= 1
+                        копия
+                    #end if
+                </span>
+            </div>
+            <div style="height: 0.35cm; width: 2.5cm; top: 9cm; left: 0cm; font-family: 'Times New Roman'; font-size: 0.25cm; text-align: center; position: absolute; overflow: hidden;" class="label ui-resizable ui-droppable ui-draggable">
+                <span class="name" style="font-weight:bold;">
+                    #from time import gmtime, strftime
+                    $strftime("%d.%m.%Y %H:%M:%S", $gmtime())
+                </span>
+            </div>
+        </div>
+		<script type="text/javascript" src="/engineU3S/systems/TASKSERVER/report/prototype.js"></script>
+		<script type="text/javascript" src="/engineU3S/systems/TASKSERVER/report/prototype-barcode.js"></script>
+		<script type="text/javascript">
+			\$('barcodeTarget').barcode("$d1.BARCODE.replace('*','')",'code128',{barWidth: '2', barHeight: '50', fontSize: '11', showHRI: false});
+			\$('barcodeTarget').style.overflow = 'hidden';
+			\$('barcodeTarget').style["padding-left"] = (\$('barcodeTargetBefore').offsetWidth - \$('barcodeTarget').offsetWidth) / 2;        
+		</script>
+		
+
+[ProcDataList]
+proc1 = d1
+
+[ProcFetches]
+proc1 = one
+

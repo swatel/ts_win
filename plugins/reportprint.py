@@ -1,14 +1,14 @@
-# -*- coding: utf-8 -*-
+# -*- coding: cp1251-*
 """
     swat 21.01.2014
     version 0.0.2.0
-    РјРѕРґСѓР»СЊ РїРµС‡Р°С‚Рё
+    модуль печати
 """
 
 import os
 import time
 import subprocess
-import configparser
+import ConfigParser
 
 #from StringIO import StringIO
 
@@ -18,7 +18,7 @@ import BasePlugin as Bp
 
 class Plugin(Bp.BasePlugin):
     """
-        РљР»Р°СЃСЃ РїРµС‡Р°С‚Рё
+        Класс печати
     """
 
     section_procedure_name = 'ProcNames'
@@ -34,14 +34,14 @@ class Plugin(Bp.BasePlugin):
 
     def run(self):
         """
-            Р—Р°РїСѓСЃРє
+            Запуск
         """
 
         if self.queueparamsxml:
             self.report_config = None
             self.kwards_print = None
             
-            """ РѕРїСЂРµРґРµР»РёС‚СЊ РіРґРµ РЅР°С…РѕРґРёС‚СЃСЏ С„Р°Р№Р» СЃ РЅР°СЃС‚СЂРѕР№РєР°РјРё """
+            """ определить где находится файл с настройками """
             sql_text = 'select R.FILENAME from RBS_Q_GETFILEREPORT' + '(?) R'
             res = self.ExecuteSQL(sql_text,
                                   sqlparams = [self.rule])
@@ -61,7 +61,7 @@ class Plugin(Bp.BasePlugin):
             
             if self.printer(report_file_name, **report_params):
                 pass
-                """ СѓРґР°Р»СЏРµРј С„Р°Р№Р» """
+                """ удаляем файл """
                 #if not self.delete_tmp_file(self.file_name_report_print):
                 #    self.LogFile(krconst.kr_message_error_errordeletefile % self.file_name_report_print)
                 #    self.result['result'] = krconst.plugin_error
@@ -75,14 +75,14 @@ class Plugin(Bp.BasePlugin):
         
     def create_print_report_file(self, html, file_name):
         """
-            РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ html -> pdf
-            РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ html -> jpg
+            Преобразование html -> pdf
+            Преобразование html -> jpg
         """
 
         tmp_file_html = (os.path.basename(file_name)).split('.')[0] + '.html'
         tmp_file_html = os.path.join(os.path.dirname(file_name), tmp_file_html)
         tmp_file = open(tmp_file_html, "w")
-        print(html, file=tmp_file)
+        print>>tmp_file, html
         tmp_file.close()
 
         dimension = self.get_dimension_from_file()
@@ -100,8 +100,8 @@ class Plugin(Bp.BasePlugin):
             dimension_str = '--width ' + dimension['width'] + ' --height ' + dimension['height'] + ' '
             convert_str = 'wkhtmltoimage -f jpg ' + dimension_str + tmp_file_html + ' ' + file_name + ' >> ./log/stdout.log 2>&1'
 
-        ''' РїСЂРµРѕР±СЂР°Р·СѓРµРј html РІ РЅСѓР¶РЅС‹Р№ С„РѕСЂРјР°С‚ '''
-        #todo РІС‹РІРѕРґ РІ Р»РѕРі СЃРґРµР»Р°С‚СЊ РїР°СЂР°РјРµС‚СЂРѕРј
+        ''' преобразуем html в нужный формат '''
+        #todo вывод в лог сделать параметром
         str_echo = 'echo $SHELL' + ' >> ./log/stdout.log 2>&1'
         os.system(str_echo)
         str_echo = 'echo $PATH' + ' >> ./log/stdout.log 2>&1'
@@ -110,10 +110,10 @@ class Plugin(Bp.BasePlugin):
         pdf = os.system(convert_str)
 
         if pdf != 0:
-            self.log_file('РћС€РёР±РєР° РєРѕРЅРІРµСЂС‚Р°С†РёРё html')
+            self.log_file('Ошибка конвертации html')
             self.result['result'] = krconst.plugin_error
 
-        ''' СѓРґР°Р»СЏРµРј С„Р°Р№Р» '''
+        ''' удаляем файл '''
         #if not self.delete_tmp_file(tmp_file_html):
         #    self.log_file(krconst.kr_message_error_errordeletefile % tmp_file_html)
         #    self.result['result'] = krconst.plugin_error
@@ -121,12 +121,12 @@ class Plugin(Bp.BasePlugin):
     
     def print_file_report(self, file_name_report):
         """
-            РїСЂРѕРІРµСЂРёРј РЅСѓР¶РЅРѕ Р»Рё РїРµС‡Р°С‚Р°С‚СЊ РґР°РЅРЅС‹Р№ РґРѕРєСѓРјРµРЅС‚ РЅР° РїСЂРёРЅС‚РµСЂ
-            РµСЃР»Рё PrintAfterDone = '1' РёР»Рё РїР°СЂРјРµС‚СЂР° РЅРµС‚, С‚Рѕ РїРµС‡Р°С‚Р°РµРј РЅР° РїСЂРёРЅС‚РµСЂ
-            РёРЅР°С‡Рµ РЅРµ РїРµС‡Р°С‚Р°РµРј
+            проверим нужно ли печатать данный документ на принтер
+            если PrintAfterDone = '1' или парметра нет, то печатаем на принтер
+            иначе не печатаем
         """
 
-        # todo РІС‹РЅРµСЃС‚Рё РїРµС‡Р°С‚СЊ РІ РѕС‚РґРµР»СЊРЅС‹Р№ РјРѕРґСѓР»СЊ
+        # todo вынести печать в отдельный модуль
 
         print_after_done = '1'
         try:
@@ -136,7 +136,7 @@ class Plugin(Bp.BasePlugin):
         if print_after_done == '0':
             return True
         
-        """ РїСЂРѕРІРµСЂРёРј РµСЃС‚СЊ Р»Рё РІ РїР°СЂР°РјРµС‚СЂР°С… РїСЂРёРЅС‚РµСЂ РЅР° РєРѕС‚РѕСЂС‹Р№ РїРµС‡Р°С‚Р°С‚СЊ """
+        """ проверим есть ли в параметрах принтер на который печатать """
         name_printer = self.ParserXML(self.queueparamsxml, 'printer')
         
         if not name_printer:
@@ -144,7 +144,7 @@ class Plugin(Bp.BasePlugin):
             self.result['result'] = krconst.plugin_error
             return False
         
-        """ РїРµС‡Р°С‚СЊ РЅР° windows """
+        """ печать на windows """
         if self.parent.k_conf.os_platform == 'win':
             try:
                 import win32api
@@ -152,18 +152,17 @@ class Plugin(Bp.BasePlugin):
                 self.log_file(krconst.kr_message_error_errorrimportlib % 'win32api')
                 self.result['result'] = krconst.plugin_error
                 return False
-            """ РµСЃР»Рё РћРЎ XP С‚Рѕ РїРµС‡Р°С‚СЊ РЅР° РёРґРµС‚ РЅР° Р»СЋР±РѕР№ РїСЂРёРЅС‚РµСЂ Рё РЅРѕСЂРјР°Р»СЊРЅРѕ РІРѕР·РІСЂР°С‰Р°РµС‚ СЃРѕРѕР±С‰РЅРёРµ РѕР± РѕС€РёР±РєРµ
-            # РЅР° РґСЂСѓРіРёС… СЃРёСЃС‚РµРјР°С… РїРµС‡Р°С‚Р°РµС‚, РЅРѕ РЅРµРїРѕРЅСЏС‚РµРЅ СЂРµР·СѓР»СЊС‚Р°С‚ """
+            """ если ОС XP то печать на идет на любой принтер и нормально возвращает сообщние об ошибке
+            # на других системах печатает, но непонятен результат """
             try:
-                win32api.ShellExecute(0, "printto", '"' + os.path.join(os.getcwd(), file_name_report) + '"',
-                                      '"%s"' % name_printer, ".", 0)
+                win32api.ShellExecute(0, "printto", file_name_report, '"%s"' % name_printer, ".", 0)
                 return True
             except:
                 self.TracebackLog(krconst.kr_message_error_errorreportpdfprint % file_name_report)
                 self.result['result'] = krconst.plugin_error
                 return False
         
-        """ РїРµС‡Р°С‚СЊ РЅР° linux """
+        """ печать на linux """
         if self.parent.k_conf.os_platform == 'linux':
             self.log_file('lp -d ' + name_printer + ' ' + file_name_report + krconst.kr_term_double_enter)
             str_print = 'lp -d ' + name_printer + ' ' + file_name_report
@@ -181,7 +180,7 @@ class Plugin(Bp.BasePlugin):
 
     def print_file_report_linux(self, str_print, repetition=True):
         """
-            РџРµС‡Р°С‚СЊ РїРѕРґ Linux
+            Печать под Linux
         """
 
         result = False
@@ -199,9 +198,9 @@ class Plugin(Bp.BasePlugin):
             try:
                 self.log_file(str_process)
             except:
-                self.log_file('РћС€РёР±РєР° РѕР±СЂР°Р±РѕС‚РєРё СЂРµР·СѓР»СЊС‚Р°С‚Р° РїСЂРё РЅР°Р»РёС‡РёРё РѕС€РёР±РєРё РІ РїРµС‡Р°С‚Рё.')
+                self.log_file('Ошибка обработки результата при наличии ошибки в печати.')
         else:
-            # РїСЂРѕРІРµСЂРёРј С‡С‚Рѕ РІ Р»РѕРіРµ
+            # проверим что в логе
             try:
                 self.log_file(str_process)
                 if 'request id is' in str_process:
@@ -209,18 +208,18 @@ class Plugin(Bp.BasePlugin):
                 else:
                     if 'lp: successful-ok' in str_process:
                         if repetition:
-                            # СЃР»СѓР¶Р±Р° РЅРµ СЂР°Р±РѕС‚Р°РµС‚, Р¶РґРµРј 2 СЃРµРє Рё РїРµСЂРµР·Р°РїСѓСЃРє
+                            # служба не работает, ждем 2 сек и перезапуск
                             time.sleep(2)
                             result = self.print_file_report_linux(str_print, repetition=False)
                         else:
                             self.result['result'] = krconst.plugin_error
                     else:
                         self.result['result'] = krconst.plugin_error
-                        self.log_file('РќРµРёР·РІРµСЃС‚РЅР°СЏ РѕС€РёР±РєР°.')
+                        self.log_file('Неизвестная ошибка.')
                     return result
             except:
                 self.result['result'] = krconst.plugin_error
-                self.log_file('РћС€РёР±РєР° РѕР±СЂР°Р±РѕС‚РєРё СЂРµР·СѓР»СЊС‚Р°С‚Р°.')
+                self.log_file('Ошибка обработки результата.')
         return result
     
     def printer(self, report_file_name, **kwargs):
@@ -249,7 +248,7 @@ class Plugin(Bp.BasePlugin):
         exec('from %s import %s' % (report_full_file_name, tmpl_report))
         html_report = str(locals()[tmpl_report](searchList = [out_data]))
 
-        ''' РїРѕР»СѓС‡РёРј С‚РёРї РєРѕРЅРІРµСЂС‚Р°С†РёРё С„Р°Р№Р»Р°, РґР»СЏ РїРµС‡Р°С‚Рё '''
+        ''' получим тип конвертации файла, для печати '''
         self.get_type_convert()
         file_name_report = os.path.join(self.parent.k_conf.global_def_dir_tmp_files,
                                         'reportQ' + str(self.queueid) + '.' + self.type_convert)
@@ -262,7 +261,7 @@ class Plugin(Bp.BasePlugin):
                 self.file_name_report_print = file_name_report
                 return True
         
-        #todo РёР·РјРµРЅРёС‚СЊ РїСЂР°РІРёР»СЊРЅС‹Р№ С„Р»Р°Рі http://pythonworld.ru/moduli/modul-os.html
+        #todo изменить правильный флаг http://pythonworld.ru/moduli/modul-os.html
         '''if os.access(file_name_report, os.F_OK):
             if self.print_file_report(file_name_report):
                 return False
@@ -275,7 +274,7 @@ class Plugin(Bp.BasePlugin):
             return False'''
     
     def get_proc_from_file(self, file_name, get_name = None):
-        self.report_config = configparser.ConfigParser()
+        self.report_config = ConfigParser.ConfigParser()
         self.report_config.read(file_name)
         procedures = []
         for item in self.report_config.options(self.section_procedure_name):
@@ -313,7 +312,7 @@ class Plugin(Bp.BasePlugin):
 
     def get_dimension_from_file(self):
         """
-            РџРѕР»СѓС‡РёС‚СЊ СЂР°Р·РјРµСЂРЅРѕСЃС‚РµР№ СЌС‚РёРєРµС‚РєРё
+            Получить размерностей этикетки
         """
 
         result = {}
@@ -324,8 +323,8 @@ class Plugin(Bp.BasePlugin):
 
     def get_type_convert(self):
         """
-           РџРѕР»СѓС‡РёРј С‚РёРї РєРѕРЅРІРµСЂС‚Р°С†РёРё html С„Р°Р№Р»Р°
-           РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ pdf
+           Получим тип конвертации html файла
+           по умолчанию pdf
         """
 
         convert = None

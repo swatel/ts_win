@@ -1,7 +1,9 @@
-# -*- coding: utf-8 -*-
+# -*- coding: windows-1251 -*-
+# coding=cp1251
 
 import os
 import re
+import glob
 import xml.etree.ElementTree as Et
 from datetime import datetime
 
@@ -31,16 +33,22 @@ except ImportError:
 
 VERSION = '0.0.2.8'
 
+import threading
+threadlocal = threading.local()
+
 
 class BasePlugin(object):
     """
-        Р‘Р°Р·РѕРІС‹Р№ РєР»Р°СЃСЃ РїР»Р°РіРёРЅРѕРІ
+        Базовый класс плагинов
     """
+
+    log_flush = False
 
     def __init__(self, *args, **kwargs):
 
         self.parent = self.get_in_params(args, 'parent')
         self.task = self.get_in_params(args, 'taskparams')
+        self.params_ext = self.get_in_params(args, 'params_ext')
 
         self.taskparamsxml = None
         self.taskactionsparamsxml = None
@@ -50,6 +58,8 @@ class BasePlugin(object):
         self.logextended = None
         self.quetaskid = None
         self.tasktype = None
+        self.layer_code = None
+        self.sn_name = None
 
         if self.task:
             self.taskparamsxml = self.task['taskparams']
@@ -83,6 +93,9 @@ class BasePlugin(object):
             self.ruleparams = self.resqueue['ruleparams']
             self.ruleactionsparams = self.resqueue['ruleactionsparams']
 
+        if self.params_ext:
+            self.log_flush = self.params_ext['log_flush']
+
         self.result = dict()
         self.result['result'] = krconst.plugin_ok
         self.result['log'] = ''
@@ -103,7 +116,7 @@ class BasePlugin(object):
         if self.queueid:
             self.LogFile('Start queueid = ' + str(self.queueid))
 
-        ''' РїСЂРѕРІРµСЂРєР° РїР°СЂР°РјРµС‚СЂРѕРІ РЅР° РІР°Р»РёРґРЅРѕСЃС‚СЊ РґР°РЅРЅС‹С… '''
+        ''' проверка параметров на валидность данных '''
 
         if self.taskparamsxml:
             self.xml_check_valid_string(self.taskparamsxml)
@@ -125,14 +138,17 @@ class BasePlugin(object):
 
         self.xml_convert = None
 
-        ''' Р”Р»СЏ СЌРєСЃРїРѕСЂС‚Р° '''
+        ''' Для экспорта '''
         self.export_file_name = None
+
+        # update turn db time (minute)
+        self.update_turn_db_time = 10
 
         #self.execute_sql = timer_sql(self)(self.execute_sql)
 
     def get_in_params(self, args, name):
         """
-            РџРѕР»СѓС‡РµРЅРёРµ РІС…РѕРґСЏС‰РёС… РїР°СЂР°РјРµС‚СЂРѕРІ
+            Получение входящих параметров
         """
 
         try:
@@ -170,7 +186,7 @@ class BasePlugin(object):
 
         #self.create_task_email()
 
-        # РїСЂРѕРІРµСЂРёРј С‚РёРї Р·Р°РґР°РЅРёСЏ Рё РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚СЊ СЃРѕР·РґР°РЅРёСЏ СЂРµРїРѕСЂС‚Р° РґР»СЏ С‚РёРїР° Р·Р°РґР°РЅРёР№ РёРјРїРѕСЂС‚
+        # проверим тип задания и необходимость создания репорта для типа заданий импорт
         if self.tasktype == 'I':
             if self.ParserXML(self.taskparamsxml, 'CreateImportReport'):
                 sql_text = 'select* from RBS_Q_CREATETASKEXPORT_REPORT(?,?,?,?)'
@@ -191,36 +207,35 @@ class BasePlugin(object):
                                        fetch='many',
                                        ExtVer=True)
                 if resm['status'] == krconst.kr_sql_error:
-                    self.LogFile("РћС€РёР±РєР° СЃРѕР·РґР°РЅРёСЏ РѕС‚С‡РµС‚Р° РѕР± РёРјРїРѕСЂС‚Рµ" + krconst.kr_term_double_enter)
+                    self.LogFile("Ошибка создания отчета об импорте" + krconst.kr_term_double_enter)
 
         'save log file'
         self.LogFile('Runtime = ' + str(datetime.today() - self.datestart))
         if type_log:
-            self.SaveLogPlugin(self.result['log'], type_log)
+            self.save_log_plugin(self.result['log'], type_log)
         return True
 
-    ''' СЂР°Р±РѕС‚Р° СЃ xml '''
+    ''' работа с xml '''
     def xml_check_valid_string(self, params_xml):
         """
-            РџСЂРѕРІРµСЂРєР° XML СЃС‚СЂРѕРєРё РЅР° РІР°Р»РёРґРЅРѕСЃС‚СЊ
+            Проверка XML строки на валидность
         """
 
         xml = None
         try:
-            # xml = Et.fromstring(params_xml.decode("cp1251").encode("utf-8"))
-            xml = Et.fromstring(params_xml)
+            xml = Et.fromstring(params_xml.decode("cp1251").encode("utf-8"))
         except:
             self.LogFile(krconst.m_e_xml_parse_str % params_xml, Terms=1, SaveLogDB=True)
             self.result['result'] = krconst.plugin_error
         return xml
 
     def ParserXML(self, paramsxml, key=None):
-        #todo СѓРґР°Р»РёС‚СЊ РїРѕСЃР»Рµ СЂРµС„Р°РєС‚РѕСЂРёРЅРіР°
+        #todo удалить после рефакторинга
         return self.parser_xml(paramsxml, key)
 
     def parser_xml(self, param_xml, key=None):
         """
-            РџРѕР»СѓС‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂР° РёР· XML
+            Получение параметра из XML
         """
 
         xml = self.xml_check_valid_string(param_xml)
@@ -231,7 +246,7 @@ class BasePlugin(object):
         else:
             ''' get value from key '''
             try:
-                key = xml.find(key).attrib['value']#.encode("cp1251")
+                key = xml.find(key).attrib['value'].encode("cp1251")
                 if key == '':
                     key = None
             except:
@@ -240,7 +255,7 @@ class BasePlugin(object):
 
     def parse_file_xml(self, file_name):
         """
-            РџР°СЂСЃРёРЅРі XML С„Р°Р№Р»Р°
+            Парсинг XML файла
         """
 
         if not self.exists_file(file_name, add_log=True):
@@ -259,14 +274,14 @@ class BasePlugin(object):
 
     def ParseFileXML(self, filenames):
         """
-            РџР°СЂСЃРёРЅРі С„Р°Р№Р»Р°
+            Парсинг файла
         """
-        #todo  СѓРґР°Р»РёС‚СЊ РїРѕСЃР»Рµ СЂРµС„Р°РєС‚РѕСЂРёРЅРіР°
+        #todo  удалить после рефакторинга
         return self.parse_file_xml(filenames)
 
     def xml_get_all_params(self, params_xml, as_dic=None):
         """
-            Р’РѕР·РІСЂР°С‰Р°РµС‚ Р·РЅР°С‡РµРЅРёРµ РєР»СЋС‡РµР№ xml СЃС‚СЂРѕРєРё
+            Возвращает значение ключей xml строки
         """
 
         xml = self.xml_check_valid_string(params_xml)
@@ -275,33 +290,33 @@ class BasePlugin(object):
         params = []
         dic = {}
         for i in xml.getiterator():
-            if list(i.items()):
+            if i.items():
                 if as_dic is None:
-                    params.append({i.tag: list(i.items())[0][1]})
+                    params.append({i.tag.encode("cp1251"): i.items()[0][1].encode("cp1251")})
                 else:
-                    dic[i.tag] = list(i.items())[0][1]
+                    dic[i.tag.encode("cp1251")] = i.items()[0][1].encode("cp1251")
         if as_dic is None:
             return params
         else:
             return dic
 
     def XMLGetAllParams(self, paramsxml, asdic=None):
-        #todo СѓРґР°Р»РёС‚СЊ РїРѕСЃР»Рµ СЂРµС„Р°РєС‚РѕСЂРёРЅРіР°
+        #todo удалить после рефакторинга
         return self.xml_get_all_params(paramsxml, asdic)
 
     def xml_get_all_params_from_file(self, file_xml, as_dic=None):
         """
-            Р’РѕР·РІСЂР°С‰Р°РµС‚ Р·РЅР°С‡РµРЅРёРµ РєР»СЋС‡РµР№ xml С„Р°Р№Р»Р°
+            Возвращает значение ключей xml файла
         """
 
         params = []
         dic = {}
         for i in file_xml.getiterator():
-            if list(i.items()):
+            if i.items():
                 if as_dic is None:
-                    params.append({i.tag: list(i.items())[0][1]})
+                    params.append({i.tag.encode("cp1251"): i.items()[0][1].encode("cp1251")})
                 else:
-                    dic[i.tag] = list(i.items())[0][1]
+                    dic[i.tag.encode("cp1251")] = i.items()[0][1].encode("cp1251")
         if as_dic is None:
             return params
         else:
@@ -309,40 +324,42 @@ class BasePlugin(object):
 
     def xml_get_value_by_attr(self, xml, attr, flag='E'):
         """
-            Р—РЅР°С‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂР° РїРѕ Р°С‚СЂРёР±СѓС‚Сѓ
+            Значение параметра по атрибуту
         """
 
         if not attr:
             self.log_file('Exec xml_get_value_by_attr without attr')
-        val = xml.get(attr)
+        val = xml.get(attr.decode("cp1251"))
 
-        ''' РїСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚СѓСЋ РґР°С‚Сѓ РєРѕС‚РѕСЂР°СЏ РјРѕР¶РµС‚ РїСЂРёР№С‚Рё РёР· 1РЎ '''
+        ''' проверка на пустую дату которая может прийти из 1С '''
         if val == '01.01.0001 0:00:00':
             val = None
         if val == '':
             val = None
         if val is not None:
-            # return val.encode("cp1251", 'ignore')
-            return val
+            return val.encode("cp1251", 'ignore')
         else:
             if flag == 'E':
                 return ''
             if flag == 'N':
                 return None
-    # СЂР°Р±РѕС‚Р° СЃ xml
+    # работа с xml
 
     @timer_sql
     def execute_sql(self, sql_text, sql_params=(), auto_commit=True, db_local=None, fetch='many', ext_ver=True):
         """
-            РІС‹РїРѕР»РЅРµРЅРёРµ SQL РєРѕРјРјР°РЅРґ
-            СЃ РІС‹РІРѕРґРѕРј РІ Р»РѕРі С„Р°Р№Р» РёРЅС„РѕСЂРјР°С†РёРё РїСЂРё РІРѕР·РЅРёРєРЅРѕРІРµРЅРёРё deadlock
+            выполнение SQL комманд
+            с выводом в лог файл информации при возникновении deadlock
         """
 
         if not self.result['LostConnect']:
             res = []
             try:
-                if not db_local:
+                if not db_local and self.db:
                     db_local = self.db
+
+                if not db_local and not self.db:
+                    db_local = getattr(threadlocal, 'resource_db', None)
 
                 res = db_local.dbExec(sql_text,
                                       params=sql_params,
@@ -363,7 +380,7 @@ class BasePlugin(object):
                         return {'status': krconst.kr_sql_ok, 'message': None, 'datalist': res}
                     else:
                         return [krconst.kr_sql_ok, None, res]
-            except Exception as exc:
+            except Exception, exc:
                 self.result['result'] = krconst.plugin_error
                 error = 'Error execute SQL command: %(sql)s %(sqlparams)s, %(err)s'\
                         % {'sql': sql_text, 'sqlparams': sql_params, 'err': exc[1]}
@@ -371,10 +388,10 @@ class BasePlugin(object):
                 self.log_to_db(error)
                 self.log_file(error)
 
-                ''' РџСЂРѕРІРµСЂРёРј РЅР° РѕС€РёР±РєСѓ. Р•СЃР»Рё  deadlock, С‚Рѕ РЅР°Р№РґРµРј С‡РµРј РѕРЅ Р·Р°Р±Р»РѕРєРёСЂРѕРІР°РЅ '''
+                ''' Проверим на ошибку. Если  deadlock, то найдем чем он заблокирован '''
                 if re.findall('deadlock|lock conflict', exc[1]):
                     try:
-                        ''' РЅР°Р№РґРµРј id С‚СЂР°РЅР·Р°РєС†РёРё '''
+                        ''' найдем id транзакции '''
                         p = re.compile(r'concurrent transaction number is (\d+)')
                         transact_id = p.search(exc[1]).group(1)
                         sql_text = 'select * from RBS_Q_DEADLOCK_GET_PROCESS(?)'
@@ -402,7 +419,7 @@ class BasePlugin(object):
                             error_deadlock = error_deadlock + '     ' + itm['SQL_TEXT'] + krconst.kr_term_enter
                             error_deadlock = error_deadlock + '==============================' + krconst.kr_term_enter
                     except:
-                        error_deadlock = 'РћС€РёР±РєР° РїРѕР»СѓС‡РµРЅРёСЏ РґР°РЅРЅС‹С… РїРѕ deadlock'
+                        error_deadlock = 'Ошибка получения данных по deadlock'
 
                     error_deadlock = krconst.kr_term_enter + error_deadlock
                     self.log_to_db(error_deadlock)
@@ -423,7 +440,7 @@ class BasePlugin(object):
                 return [krconst.kr_sql_lost_connect, error, None]
 
     def ExecuteSQL(self, sqltext, sqlparams=(), auto_commit=True, db_local=None, fetch='many', ExtVer=False):
-        #todo РїРѕСЃР»Рµ РїРµСЂРµС…РѕРґР° СѓРґР°Р»РёС‚СЊ
+        #todo после перехода удалить
 
         return self.execute_sql(sqltext,
                                 sql_params=sqlparams,
@@ -434,7 +451,7 @@ class BasePlugin(object):
 
     def log_file(self, message, terms=0, save_log_db=False):
         """
-            Р›РѕРіРёСЂРѕРІР°РЅРёРµ РІ С„Р°Р№Р»
+            Логирование в файл
         """
 
         self.result['log'] += rqu.decodeXStr(message) + krconst.kr_term_space
@@ -444,16 +461,20 @@ class BasePlugin(object):
         if save_log_db:
             self.log_to_db(message, terms=terms)
 
+        if self.log_flush:
+            self.save_log_plugin(self.result['log'], c.log_info)
+            self.result['log'] = ''
+
     def LogFile(self, message, Terms=0, SaveLogDB=False):
         """
-            Р›РѕРіРёСЂРѕРІР°РЅРёРµ РІ С„Р°Р№Р»
+            Логирование в файл
         """
 
         self.log_file(message, Terms, SaveLogDB)
 
     def log_to_db(self, message, terms=0):
         """
-            Р›РѕРіРёСЂРѕРІР°РЅРёРµ РІ Р‘Р”
+            Логирование в БД
         """
 
         self.result['logDB'] += rqu.decodeXStr(message) + krconst.kr_term_enter
@@ -461,14 +482,14 @@ class BasePlugin(object):
             self.result['logDB'] += krconst.kr_term_enter
             terms -= 1
 
-    def SaveLogPlugin(self, message, typemessage='INFO'):
+    def save_log_plugin(self, message, typemessage='INFO'):
         # write log
         if self.base_plugin_log:
             self.base_plugin_log.write(message, krconst.kr_flag_logplugin, typemessage)
 
     def update_status_turn_db(self, queueid, status, params=None):
         """
-            РћР±РЅРѕРІР»РµРЅРёРµ СЃС‚Р°С‚СѓСЃР° Р·Р°РґР°РЅРёСЏ
+            Обновление статуса задания
         """
 
         if queueid:
@@ -483,7 +504,8 @@ class BasePlugin(object):
                 sql_text += ', r.result = ? '
             sql_params = [status, log]
             if status == krconst.kr_status_new:
-                sql_text += ' , r.starttime = DATEADD(10 MINUTE to r.starttime) '
+                sql_text += ' , r.starttime = DATEADD({minute} MINUTE to r.starttime) '.format(
+                    minute=self.update_turn_db_time)
             if self.export_file_name:
                 sql_text += ' , r.resultfilename = ?, r.resultfilesize = ?'
                 sql_params += [self.export_file_name, os.path.getsize(self.export_file_name)]
@@ -497,7 +519,7 @@ class BasePlugin(object):
                                      params=sql_params,
                                      fetch='None')
                 return [krconst.kr_sql_ok, None]
-            except Exception as exc:
+            except Exception, exc:
                 self.LogFile('Error update status queueid:')
                 error = 'Error execute SQL command: %(sql)s %(sqlparams)s, %(err)s' % \
                         {'sql': sql_text, 'sqlparams': sql_params, 'err': exc[1]}
@@ -528,12 +550,12 @@ class BasePlugin(object):
 
     def check_file_in_queue_sort(self, filename, flag, que_sort_id=None, file_name_dest=None):
         """
-        РџСЂРѕРІРµСЂРєР° С„Р°Р№Р»Р° РІ СЃРѕСЂС‚РёСЂРѕРІС‰РёРєРµ
-        @param filename: РёРјСЏ С„Р°Р№Р»Р°
-        @param flag: С„Р»Р°Рі, РѕС‚РєСѓРґР° РїСЂРёС€РµР» Р·Р°РїСЂРѕСЃ РЅР° С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ Р·Р°РґР°РЅРёСЏ
-        @param que_sort_id: РёРґ СЃРѕСЂС‚РёСЂРѕРІРєРё
-        @param file_name_dest: РєСѓРґР° СЃРєРѕРїРёСЂРѕРІР°С‚СЊ С„Р°Р№Р» РїРѕСЃР»Рµ РѕР±СЂР°Р±РѕС‚РєРё
-        @return: РёРґ Р·Р°РґР°РЅРёСЏ
+        Проверка файла в сортировщике
+        @param filename: имя файла
+        @param flag: флаг, откуда пришел запрос на формирование задания
+        @param que_sort_id: ид сортировки
+        @param file_name_dest: куда скопировать файл после обработки
+        @return: ид задания
         """
 
         res = None
@@ -553,10 +575,10 @@ class BasePlugin(object):
             file_size = None
             try:
                 file_size = os.path.getsize(filename)
-            except Exception as exc:
+            except Exception, exc:
                 self.LogFile(exc[1])
 
-            # РѕРїСЂРµРґРµР»СЏРµРј С‚РёРї СЃРѕР·РґР°РЅРёСЏ Р·Р°РґР°РЅРёСЏ
+            # определяем тип создания задания
             if flag == 'CheckDir':
                 sql_text = 'select R.QUEUEID from RBS_Q_CREATEQUEUE_FILENAME (?,?,?,?,?,?,?) R'
                 sql_params = [res[0]['QUETASKID'], res[0]['RULE'], flag, os.path.basename(filename), 10,
@@ -567,13 +589,13 @@ class BasePlugin(object):
                               self.parent.k_conf.global_def_dir_tmp_files, file_size,
                               file_name_dest]
 
-            # СЃРѕР·РґР°РµРј Р·Р°РґР°РЅРёРµ СЃ СЃС‚Р°С‚СѓСЃРѕРј L, С‡С‚Рѕ Р±С‹ СЃРєРѕРїРёСЂРѕРІР°С‚СЊ С„Р°Р№Р» РІ РЅСѓР¶РЅСѓСЋ РїР°РїРєСѓ Рё РѕР±РЅРѕРІРёС‚СЊ СЃС‚Р°С‚СѓСЃ Р·Р°РґР°РЅРёСЋ РІ 0
+            # создаем задание с статусом L, что бы скопировать файл в нужную папку и обновить статус заданию в 0
             try:
                 cr_queue = self.db.dbExec(sql_text,
                                           params=sql_params,
                                           fetch='many')
                 return cr_queue[0]['QUEUEID']
-            except Exception as exc:
+            except Exception, exc:
                 self.LogFile(exc[1])
                 return None
         else:
@@ -581,14 +603,14 @@ class BasePlugin(object):
 
     def is_exists_folder(self, path):
         """
-            РџСЂРѕРІРµСЂРєР° РЅР° СЃСѓС‰РµСЃС‚РІРѕРІР°РЅРёРµ РєР°С‚Р°Р»РѕРіР°
+            Проверка на существование каталога
         """
 
         return os.path.exists(os.path.dirname(path) + '/')
 
     def create_folder(self, path):
         """
-            РЎРѕР·РґР°РЅРёРµ РєР°С‚Р°Р»РѕРіР°
+            Создание каталога
         """
 
         if not self.is_exists_folder(path):
@@ -596,7 +618,7 @@ class BasePlugin(object):
 
     def copy_file(self, src_file, dst_file):
         """
-            РљРѕРїРёСЂРѕРІР°РЅРёРµ С„Р°Р№Р»Р°
+            Копирование файла
         """
 
         self.create_folder(dst_file)
@@ -611,7 +633,7 @@ class BasePlugin(object):
 
     def move_file(self, src_file, dst_file):
         """
-            РџРµСЂРµРЅРёРјРµРЅРѕРІР°РЅРёРµ С„Р°Р№Р»Р°
+            Перенименование файла
         """
 
         self.create_folder(dst_file)
@@ -626,10 +648,10 @@ class BasePlugin(object):
 
     def delete_tmp_file(self, full_file_name, delete_dir=False):
         """
-        РЈРґР°Р»РµРЅРёРµ С„Р°Р№Р»Р° + РґРёСЂРµРєС‚РѕСЂРёРё РµСЃР»Рё РЅСѓР¶РЅРѕ, РµСЃР»Рё РѕРЅР° РїСѓСЃС‚Р°
-        @param full_file_name: РёРјСЏ С„Р°Р№Р»Р°
-        @param delete_dir: РїСЂРёР·РЅР°Рє СѓРґР°Р»РµРЅРёСЏ РґРёСЂРµРєС‚РѕСЂРёРё РµСЃР»Рё РѕРЅР° РїСѓСЃС‚Р°
-        @return: СѓСЃРїРµС€РЅРѕСЃС‚СЊ РґРµР№СЃС‚РІРёРµ
+        Удаление файла + директории если нужно, если она пуста
+        @param full_file_name: имя файла
+        @param delete_dir: признак удаления директории если она пуста
+        @return: успешность действие
         """
         if self.exists_file(full_file_name, add_log=False):
             try:
@@ -638,7 +660,7 @@ class BasePlugin(object):
                 raise
                 return False
         if delete_dir:
-            ''' РїСЂРѕРІРµСЂРёРј РµСЃС‚СЊ Р»Рё РІ РєР°С‚Р°Р»РѕРіРµ РµС‰Рµ С„Р°Р№Р»С‹'''
+            ''' проверим есть ли в каталоге еще файлы'''
             file_dir = os.path.dirname(full_file_name)
             try:
                 if not os.listdir(file_dir):
@@ -652,7 +674,7 @@ class BasePlugin(object):
 
     def delete_dir(self, dir_name):
         """
-            РЈРґР°Р»РµРЅРёРµ РєР°С‚Р°Р»РѕРіР°
+            Удаление каталога
         """
 
         import shutil
@@ -665,7 +687,7 @@ class BasePlugin(object):
 
     def exists_file(self, file_name, add_log=True):
         """
-            РЎСѓС‰РµСЃС‚РІРѕРІР°РЅРёРµ С„Р°Р№Р»Р°, СЃ Р·Р°РїРёСЃСЊСЋ РІ Р»РѕРі РїСЂРё РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё
+            Существование файла, с записью в лог при необходимости
         """
 
         if not os.access(file_name, os.F_OK):
@@ -679,19 +701,64 @@ class BasePlugin(object):
 
     def text_save_to_file(self, text, dst_file):
         """
-            РЎРѕС…СЂР°РЅРµРЅРёРµ С‚РµРєСЃС‚Р° РІ С„Р°Р№Р»
+            Сохранение текста в файл
         """
 
         self.create_folder(dst_file)
         if os.access(dst_file, os.F_OK):
             self.delete_tmp_file(dst_file)
         file_save = open(dst_file, "a")
-        print(text, file=file_save)
+        print >> file_save, text
         file_save.close()
+
+    def check_dir_by_path_ext(self, path, sub_folders, mask_files='*', ignore_path=' ', mtime_from=None, mtime_to=None, ignore_file=' '):
+        """
+        Проверка каталога на наличие файла по маске файла
+        @param path: путь к файлу
+        @param sub_folders: проверять ли подкаталоги
+        @param mask_files: маска файла
+        @param ignore_path: игнорируемый путь
+        @param mtime_from: ограничение на дату изменения файла (с) unix_timestamp
+        @param mtime_to: ограничение на дату изменения файла (по) unix_timestamp
+        @param ignore_file: игнорируемые файлы
+        @return:
+        """
+
+        res_file_list = []
+        for mask in mask_files.split(','):
+            file_list = sorted(glob.glob(path + '/' + mask), key=os.path.getmtime)
+            for itm in file_list:
+                if not itm.endswith('/' + ignore_path) and not itm.endswith('\\' + ignore_path):
+                    if os.path.isfile(itm):
+                        itm_replaced = itm.replace('\\', '/')
+                        if mtime_from is not None or mtime_to is not None:
+                            mtime = os.path.getmtime(itm)
+                            mtime_accepted = (mtime_from is None or mtime >= mtime_from) \
+                                             and (mtime_to is None or mtime <= mtime_to)
+                            if mtime_accepted:
+                                res_file_list.append(itm_replaced)
+                        else:
+                            file_name = os.path.basename(itm_replaced)
+                            if not file_name.startswith(ignore_file):
+                                res_file_list.append(itm_replaced)
+                    elif sub_folders == '1':
+                        if os.path.isdir(itm):
+                            tmp_file_list = self.check_dir_by_path_ext(itm,
+                                                                       sub_folders,
+                                                                       mask_files=mask_files,
+                                                                       ignore_path=ignore_path,
+                                                                       mtime_from=mtime_from,
+                                                                       mtime_to=mtime_to,
+                                                                       ignore_file=ignore_file)
+                            if tmp_file_list:
+                                for itm_file in tmp_file_list:
+                                    res_file_list.append(itm_file.replace('\\', '/'))
+        return res_file_list
+
 
     def read_config_other_db(self, name_db):
         """
-            Р§С‚РµРЅРёРµ РЅР°СЃС‚СЂРѕРµРє РґР»СЏ РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє РґСЂСѓРіРѕР№ Р‘Р”
+            Чтение настроек для подключения к другой БД
         """
 
         other_db_cfg = kc.KConfig(name_db)
@@ -747,7 +814,7 @@ class BasePlugin(object):
                         return {'status': krconst.kr_sql_lost_connect, 'message': db_local.db_message, 'datalist': None}
                     else:
                         return {'status': krconst.kr_sql_ok, 'message': None, 'datalist': res}
-                except Exception as exc:
+                except Exception, exc:
                     self.result['result'] = krconst.plugin_error
                     error = 'Error execute SQL in MSSQL command: %(sql)s %(sqlparams)s, %(err)s' % {'sql': sqltext, 'sqlparams': sqlparams, 'err': db_local.db_message}
                     self.log_to_db(error)
@@ -780,10 +847,10 @@ class BasePlugin(object):
         message = rqu.TracebackLog(message)
         self.LogFile(message, SaveLogDB=SaveLogDB)
 
-    ''' Р Р°Р±РѕС‚Р° СЃ MySQL '''
+    ''' Работа с MySQL '''
     def mysql_connect(self, name_db):
         """
-            РџРѕРґРєР»СЋС‡РµРЅРёРµ Рє Р‘Р” MySQL
+            Подключение к БД MySQL
         """
         mysql_cfg = my.MysqlConfig(name_db)
         if mysql_cfg.status_config == krconst.kr_status_config_ok:
@@ -803,7 +870,7 @@ class BasePlugin(object):
     @timer_sql
     def odb_exec_sql(self, sql_text, sql_params=(), auto_commit=True, db_local=None, fetch='many'):
         """
-            Р’С‹РїРѕР»РЅРµРЅРёРµ Р·Р°РїСЂРѕСЃРѕРІ Рє MSSQL Рё MySQL
+            Выполнение запросов к MSSQL и MySQL
         """
 
         if not db_local:
@@ -856,10 +923,10 @@ class BasePlugin(object):
                         'message': error,
                         'datalist': None}
 
-    ''' РњРµС‚РѕРґС‹ РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ СЃРµС‚РµРІС‹РјРё СѓСЃС‚СЂРѕР№СЃС‚РІР°РјРё '''
+    ''' Методы для работы с сетевыми устройствами '''
     def mount_dir(self):
         """
-            РџРѕРґРєР»СЋС‡РµРЅРёРµ СЂРµСЃСѓСЂСЃР°: РґРёСЂРµРєС‚РѕСЂРёРё
+            Подключение ресурса: директории
         """
 
         mount_cmd = None
@@ -873,6 +940,7 @@ class BasePlugin(object):
 
         if mount_dir == '1':
             try:
+                os.system("ps -efww | grep mount | grep -v grep | awk '{print $2}' | xargs kill")
                 os.system(un_mount_cmd)
             except:
                 self.log_file(krconst.m_e_mount_dir % un_mount_cmd)
@@ -884,12 +952,12 @@ class BasePlugin(object):
 
     # def create_task_email(self):
     #     """
-    #     РЎРѕР·РґР°РЅРёРµ Р·Р°РґР°РЅРёСЏ РЅР° РѕС‚РїСЂР°РІРєСѓ РїРѕС‡С‚С‹ РїСЂРё РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё
+    #     Создание задания на отправку почты при необходимости
     #     """
     #
-    #     # СЃРѕР·РґР°РµРј Р·Р°РґР°РЅРёРµ РµСЃР»Рё
-    #     # 1. Р—Р°РґР°РЅРёРµ Р·Р°РІРµСЂС€РёР»РѕСЃСЊ СЃ РѕС€РёР±РєРѕР№
-    #     # 2. РќСѓР¶РЅРѕ РѕС‚РїСЂР°РІР»СЏС‚СЊ РїРёСЃСЊРјРѕ
+    #     # создаем задание если
+    #     # 1. Задание завершилось с ошибкой
+    #     # 2. Нужно отправлять письмо
     #
     #     if self.result['result'] == krconst.plugin_error \
     #             and self.parser_xml(self.taskparamsxml, 'send_error_email') == '1':
@@ -903,17 +971,17 @@ class BasePlugin(object):
     #                           terms=2,
     #                           save_log_db=True)
     #         else:
-    #             self.log_file('РЎРѕР·РґР°РЅРѕ Р·Р°РґР°РЅРёРµ РЅР° РѕС‚РїСЂР°РІРєСѓ РїРѕС‡С‚С‹.',
+    #             self.log_file('Создано задание на отправку почты.',
     #                           terms=2,
     #                           save_log_db=True)
     def create_task_email(self):
         """
-        РЎРѕР·РґР°РЅРёРµ Р·Р°РґР°РЅРёСЏ РЅР° РѕС‚РїСЂР°РІРєСѓ РїРѕС‡С‚С‹ РїСЂРё РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё
+        Создание задания на отправку почты при необходимости
         """
 
-        # СЃРѕР·РґР°РµРј Р·Р°РґР°РЅРёРµ РµСЃР»Рё
-        # 1. Р—Р°РґР°РЅРёРµ Р·Р°РІРµСЂС€РёР»РѕСЃСЊ СЃ РѕС€РёР±РєРѕР№
-        # 2. РќСѓР¶РЅРѕ РѕС‚РїСЂР°РІР»СЏС‚СЊ РїРёСЃСЊРјРѕ
+        # создаем задание если
+        # 1. Задание завершилось с ошибкой
+        # 2. Нужно отправлять письмо
 
         if self.result['result'] == krconst.kr_result_pligin_error:
             send_error_email = self.ParserXML(self.taskparamsxml, 'send_error_email')
@@ -929,16 +997,16 @@ class BasePlugin(object):
                                  Terms=2,
                                  SaveLogDB=True)
                 else:
-                    self.LogFile('РЎРѕР·РґР°РЅРѕ Р·Р°РґР°РЅРёРµ РЅР° РѕС‚РїСЂР°РІРєСѓ РїРѕС‡С‚С‹.',
+                    self.LogFile('Создано задание на отправку почты.',
                                  Terms=2,
                                  SaveLogDB=True)
 
     def create_queue_bond(self, docid, bond_type='I', auto_commit=True):
         """
-        РЎРІСЏР·СЊ РґРѕРєСѓРјРµРЅС‚Р° Рё Р·Р°РґР°РЅРёСЏ
-        @param docid: Р”РѕРєСѓРјРµРЅС‚
-        @param bond_type: РўРёРї СЃРІСЏР·Рё
-        @param auto_commit: РђРІС‚РѕР·Р°РІРµСЂС€РµРЅРёРµ С‚СЂР°РЅР·Р°РєС†РёРё
+        Связь документа и задания
+        @param docid: Документ
+        @param bond_type: Тип связи
+        @param auto_commit: Автозавершение транзакции
         @return:
         """
         if docid is not None and self.queueid is not None:
@@ -953,3 +1021,71 @@ class BasePlugin(object):
             else:
                 return True
         return False
+
+    def export_file(self, dir_export, file_name, doc_txt):
+        """
+        Создание файла
+        @param file_name: имя файла
+        @param doc_txt: dict документа
+        """
+
+        file_name = os.path.join(dir_export, file_name)
+        self.log_file('Сохраняем файл:' + file_name, terms=1)
+        # if self.re_write == '0':
+        #     if self.exists_file(file_name.decode('cp1251'), add_log=False):
+        #         self.log_file('Файл существует, не перезаписываем его:' + file_name, terms=1)
+        #         return False
+
+        self.log_file('Создаем файл:' + file_name, terms=1)
+        self.delete_tmp_file(file_name.decode('cp1251'))
+        file_save = open(file_name.decode('cp1251'), "a")
+        print >> file_save, doc_txt
+        file_save.close()
+        self.log_file('Сохранили.', terms=1)
+
+    # методы для работы с движком
+    def engine_get_db(self, name_xml, layer_code=None, sql_text_add=None):
+        """
+        Получение всех слоев движка
+        @param name_xml: наименвание секции для подключения к Engine
+        @param layer_code: код слоя
+        @param sql_text_add: добавочниый sql текст
+        @return: список слоев
+        """
+
+        result = []
+
+        self.log_file('Подключение к Engine', terms=1)
+        engine_conf = kc.KConfig(name_xml)
+        engine_conf.get_config_file()
+        engine_conf.get_config_layer()
+        engine_conf.get_config()
+        db_engine = db.QueryDB(engine_conf)
+        # todo Щеглов: нужна правильная проверка на коннект
+        if db_engine.connect:
+            self.log_file('Подклчение к Engine прошло успешно', terms=1)
+            # Получаем все слои и дополнительные параметры
+
+            sql_text = '''select l.code, u.email,  LPAD(u.sa_uid, 9, '0') as sa_uid, u.login
+                                        from engine_layers l
+                                             left join engine_users u on l.owner_id = u.id_user
+                                        where l.code <> 'GLOBAL' '''
+            sql_params = []
+            if layer_code:
+                sql_text += ' and l.code=? '
+                sql_params = [layer_code]
+            if sql_text_add:
+                sql_text += sql_text_add
+
+            res = self.execute_sql(sql_text,
+                                   sql_params=sql_params,
+                                   db_local=db_engine,
+                                   fetch='many'
+                                   )
+            if res['status'] == c.kr_sql_error:
+                self.log_file('Ошибка получения всех слоев', terms=1)
+            else:
+                result = res['datalist']
+        else:
+            self.log_file('Ошибка подключения к Engine', terms=1)
+        return result, engine_conf

@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
+# -*- coding: cp1251-*
 """
     23.03.2015
-    РЈС‚РёР»РёС‚С‹ СЂР°Р±РѕС‚С‹ СЃ С„Р°Р№Р»Р°РјРё Рё РґРёСЂРµРєС‚РѕСЂРёСЏРјРё
+    Утилиты работы с файлами и директориями
 """
 
 import os
@@ -10,7 +10,7 @@ import glob
 
 def get_first_file_mask(path, mask):
     """
-        РџРѕР»СѓС‡РµРЅРёРµ СЃР°РјРѕРіРѕ СЃС‚Р°СЂРѕРіРѕ С„Р°Р№Р»Р° РІ РїР°РїРєРµ
+        Получение самого старого файла в папке
     """
 
     file_list = sorted(glob.glob(path + '/' + mask),
@@ -22,14 +22,14 @@ def get_first_file_mask(path, mask):
 def check_dir_by_path(path, sub_folders, mask_files='*', ignore_path=' ', mtime_from=None, mtime_to=None,
                       ignore_file=' '):
     """
-    РџСЂРѕРІРµСЂРєР° РєР°С‚Р°Р»РѕРіР° РЅР° РЅР°Р»РёС‡РёРµ С„Р°Р№Р»Р° РїРѕ РјР°СЃРєРµ С„Р°Р№Р»Р°
-    @param path: РїСѓС‚СЊ Рє С„Р°Р№Р»Сѓ
-    @param sub_folders: РїСЂРѕРІРµСЂСЏС‚СЊ Р»Рё РїРѕРґРєР°С‚Р°Р»РѕРіРё
-    @param mask_files: РјР°СЃРєР° С„Р°Р№Р»Р°
-    @param ignore_path: РёРіРЅРѕСЂРёСЂСѓРµРјС‹Р№ РїСѓС‚СЊ
-    @param mtime_from: РѕРіСЂР°РЅРёС‡РµРЅРёРµ РЅР° РґР°С‚Сѓ РёР·РјРµРЅРµРЅРёСЏ С„Р°Р№Р»Р° (СЃ) unix_timestamp
-    @param mtime_to: РѕРіСЂР°РЅРёС‡РµРЅРёРµ РЅР° РґР°С‚Сѓ РёР·РјРµРЅРµРЅРёСЏ С„Р°Р№Р»Р° (РїРѕ) unix_timestamp
-    @param ignore_file: РёРіРЅРѕСЂРёСЂСѓРµРјС‹Рµ С„Р°Р№Р»С‹
+    Проверка каталога на наличие файла по маске файла
+    @param path: путь к файлу
+    @param sub_folders: проверять ли подкаталоги
+    @param mask_files: маска файла
+    @param ignore_path: игнорируемый путь
+    @param mtime_from: ограничение на дату изменения файла (с) unix_timestamp
+    @param mtime_to: ограничение на дату изменения файла (по) unix_timestamp
+    @param ignore_file: игнорируемые файлы
     @return:
     """
 
@@ -67,10 +67,10 @@ def check_dir_by_path(path, sub_folders, mask_files='*', ignore_path=' ', mtime_
 
 def delete_tmp_file(full_file_name, delete_dir=False):
     """
-    РЈРґР°Р»РµРЅРёРµ С„Р°Р№Р»Р° + РґРёСЂРµРєС‚РѕСЂРёРё РµСЃР»Рё РЅСѓР¶РЅРѕ, РµСЃР»Рё РѕРЅР° РїСѓСЃС‚Р°
-    @param full_file_name: РёРјСЏ С„Р°Р№Р»Р°
-    @param delete_dir: РїСЂРёР·РЅР°Рє СѓРґР°Р»РµРЅРёСЏ РґРёСЂРµРєС‚РѕСЂРёРё РµСЃР»Рё РѕРЅР° РїСѓСЃС‚Р°
-    @return: СѓСЃРїРµС€РЅРѕСЃС‚СЊ РґРµР№СЃС‚РІРёРµ
+    Удаление файла + директории если нужно, если она пуста
+    @param full_file_name: имя файла
+    @param delete_dir: признак удаления директории если она пуста
+    @return: успешность действие
     """
     if os.access(full_file_name, os.F_OK):
         try:
@@ -79,7 +79,7 @@ def delete_tmp_file(full_file_name, delete_dir=False):
             raise
             return False
     if delete_dir:
-        ''' РїСЂРѕРІРµСЂРёРј РµСЃС‚СЊ Р»Рё РІ РєР°С‚Р°Р»РѕРіРµ РµС‰Рµ С„Р°Р№Р»С‹'''
+        ''' проверим есть ли в каталоге еще файлы'''
         file_dir = os.path.dirname(full_file_name)
         try:
             if not os.listdir(file_dir):

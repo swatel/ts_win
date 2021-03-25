@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
+# -*- coding: cp1251-*
 """
     23.03.2015
-    РЈС‚РёР»РёС‚С‹ СЂР°Р±РѕС‚С‹ СЃ Р°СЂС…РёРІРѕРј
+    Утилиты работы с архивом
 """
 
 import os
@@ -23,7 +23,7 @@ ZIP_ERRORS = {
 
 def unpack_file(file_name):
     """
-        Р Р°СЃРїР°РєРѕРІРєР° С„Р°Р№Р»Р° Р°СЂС…РёРІР°
+        Распаковка файла архива
     """
 
     res = dict()
@@ -41,7 +41,7 @@ def unpack_file(file_name):
 
 def pack_file(file_name, file_pack):
     """
-        РЈРїР°РєРѕРІРєР° С„Р°Р№Р»Р°
+        Упаковка файла
     """
 
     result = True
@@ -61,7 +61,7 @@ def pack_file(file_name, file_pack):
 
 def pack_dir(dir_name, dir_pack):
     """
-        РЈРїР°РєРѕРІРєР° С„Р°Р№Р»Р°
+        Упаковка файла
     """
 
     result = True

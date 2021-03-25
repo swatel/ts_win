@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
+# -*- coding: cp1251-*
 """
     24.03.2015
-    РњРѕРґСѓР»СЊ Р»РѕРіРёСЂРѕРІР°РЅРёСЏ СЂР°Р±РѕС‚С‹ СЃРµСЂРІРµСЂР°-Р·Р°РґР°С‡
+    Модуль логирования работы сервера-задач
 """
 
 import time
@@ -12,7 +12,7 @@ import utils.a7z as arc
 
 class RPLogger(object):
     """
-        РљР»Р°СЃСЃ Р»РѕРіРёСЂРѕРІР°РЅРёСЏ
+        Класс логирования
     """
 
     def __init__(self, **kwargs):
@@ -23,7 +23,7 @@ class RPLogger(object):
 
     def write(self, text, flag, type_message='INFO'):
         """
-            Р—Р°РїРёСЃСЊ С„Р°Р№Р»Р° РІ Р»РѕРі
+            Запись файла в лог
         """
 
         current_time = time.strftime('%a %b %d %Y %H:%M:%S', time.localtime())
@@ -39,24 +39,24 @@ class RPLogger(object):
                     file_7z = os.path.basename(file_7z)
                     file_7z = 'arc/' + file_7z.replace(':', '_')
                     if arc.pack_file(self.file_name, file_7z):
-                        # todo РїРµСЂРµРЅРѕСЃ Р°СЂС…РёРІР° РІ РґСЂСѓРіСѓСЋ РїР°РїРєСѓ
+                        # todo перенос архива в другую папку
                         file_log = open(self.file_name, 'w')
                         file_log.close()
 
                 self.file = open(self.file_name, "a")
             try:
-                print(current_time + ' ' + type_message + ': ' + text, file=self.file)
+                print>>self.file, current_time + ' ' + type_message + ': ' + text
                 self.file.close()
             except:
                 ''' error in text coding '''
                 self.file = open(self.cfg.main_path + "/error.log", "a")
                 if flag == c.kr_flag_logglobal:
                     self.cfg.global_log = 0
-                    print(start_error_log + c.m_e_global_log, file=self.file)
+                    print>>self.file, start_error_log + c.m_e_global_log
                 if flag == c.kr_flag_logplugin:
-                    print(start_error_log + c.m_e_plugin_log, file=self.file)
+                    print>>self.file, start_error_log + c.m_e_plugin_log
 
-                print(start_error_log + c.m_e_log_text, file=self.file)
+                print>>self.file, start_error_log + c.m_e_log_text
                 self.file.close()
                 return False
         except:
@@ -64,29 +64,29 @@ class RPLogger(object):
             self.file = open(self.cfg.main_path + "/error.log", "a")
             if flag == c.kr_flag_logglobal:
                 self.cfg.global_log = 0
-                print(start_error_log + c.m_e_global_log, file=self.file)
+                print>>self.file, start_error_log + c.m_e_global_log
 
             if flag == c.kr_flag_logplugin:
                 self.file = open(self.cfg.main_path + "/error.log", "a")
-                print(start_error_log + c.m_e_plugin_log, file=self.file)
+                print>>self.file, start_error_log + c.m_e_plugin_log
 
-            print(start_error_log + c.m_e_file_not_found % self.file_name, file=self.file)
+            print>>self.file, start_error_log + c.m_e_file_not_found % self.file_name
             self.file.close()
             return False
         if flag == c.kr_flag_logplugin:
             return True
 
-    #todo РїРµСЂРµРЅРµСЃС‚Рё РІ СѓС‚РёР»РёС‚С‹
+    #todo перенести в утилиты
     def is_exists_folder(self, path):
         """
-            РџСЂРѕРІРµСЂРєР° РЅР° СЃСѓС‰РµСЃС‚РІРѕРІР°РЅРёРµ РєР°С‚Р°Р»РѕРіР°
+            Проверка на существование каталога
         """
 
         return os.path.exists(os.path.dirname(path) + '/')
 
     def create_folder(self, path):
         """
-            РЎРѕР·РґР°РЅРёРµ РєР°С‚Р°Р»РѕРіР°
+            Создание каталога
         """
 
         if not self.is_exists_folder(path):

@@ -1,7 +1,7 @@
 echo off
 SETLOCAL ENABLEEXTENSIONS ENABLEDELAYEDEXPANSION
-cd "D:\work\ritm-log\to_python3"
-C:\Python37\python.exe cheetah-compile -R --nobackup
+cd "D:\work\Projects\taskserver-source\"
+c:\python26\python.exe cheetah-compile -R --nobackup
 
 pause
 

@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: cp1251-*
 
 import re
 import os
@@ -6,17 +6,15 @@ import time
 import sys
 import glob
 import traceback
-import json
-import six
 
+from mx.DateTime import now
 from datetime import timedelta
-from datetime import datetime
 
 from xml.dom import minidom
 
 import krconst
 
-' С‡РёСЃР»Рѕ РІ Р»СЋР±РѕРј РІРёРґРµ '
+' число в любом виде '
 Regex_Number = re.compile(r"(?i)^(\+|-)?[0-9]*\.?[0-9]*((?<=([0-9]|\.))e(\+|-)?[0-9]+)?$")
 
 Zip_Errors = {
@@ -46,7 +44,7 @@ def formatMxDateTime(mxDateTime, format=None, sformatFrom='%Y-%m-%d %H:%M:%S'):
 
 def decodeXStr(text):
     """
-        РџРµСЂРµРєРѕРґРёСЂСѓРµС‚ СЃС‚СЂРѕРєСѓ
+        Перекодирует строку
     """
 
     text = str(text)
@@ -57,19 +55,19 @@ def decodeXStr(text):
         if not first:
             try:
                 code = int(letter_code[:2], 16)
-                ret += chr(code) + letter_code[2:] #СЃСЂР°Р±Р°С‚С‹РІР°РµС‚ РІ СЃР»СѓС‡Р°Рµ РїРѕСЃР»РµРґРЅРµРіРѕ СЃРёРјРІРѕР»Р°
+                ret += chr(code) + letter_code[2:] #срабатывает в случае последнего символа
             except:
                 ret += '\\x%s' % letter_code
         else:
-            #С‚Рѕ, С‡С‚Рѕ РґРѕ РїРµСЂРІРѕРіРѕ \x
+            #то, что до первого \x
             first = False
             ret += '%s' % letter_code
     return ret
 
 
 def decodeUStr(s):
-    r"""РџСЂРµРѕР±СЂР°Р·СѓРµС‚ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚Рё, СЃРѕСЃС‚РѕСЏС‰РёРµ РёР· СЃРёРјРІРѕР»РѕРІ СЋРЅРёРєРѕРґР° РІРёРґР° \uNNNN
-     РІ РѕРґРЅРѕР±Р°Р№С‚РѕРІС‹Рµ СЃРёРјРІРѕР»С‹ РІ РєРѕРґРёСЂРѕРІРєРµ cp1251 (РёРЅРѕРіРґР° С‚СЂРµР±СѓРµС‚СЃСЏ РїРѕСЃР»Рµ json.dumps)
+    r"""Преобразует последовательности, состоящие из символов юникода вида \uNNNN
+     в однобайтовые символы в кодировке cp1251 (иногда требуется после json.dumps)
 
     """
     s = str(s)
@@ -80,43 +78,19 @@ def decodeUStr(s):
         if not first:
             try:
                 code = int(letter_code[:4], 16)
-                ret += chr(code).encode('cp1251') + letter_code[4:] #СЃСЂР°Р±Р°С‚С‹РІР°РµС‚ РІ СЃР»СѓС‡Р°Рµ РїРѕСЃР»РµРґРЅРµРіРѕ СЃРёРјРІРѕР»Р°
+                ret += unichr(code).encode('cp1251') + letter_code[4:] #срабатывает в случае последнего символа
             except:
                 ret += '\\u%s' % letter_code
         else:
-            #С‚Рѕ, С‡С‚Рѕ РґРѕ РїРµСЂРІРѕРіРѕ \x
+            #то, что до первого \x
             first = False
             ret += '%s' % letter_code
     return ret
 
 
-def convToWin(s, encoding='utf-8', errors='replace'):
-    """РџСЂРµРѕР±СЂР°Р·СѓРµС‚ СЃС‚СЂРѕРєСѓ РІ РєРѕРґРёСЂРѕРІРєРµ encoding РІ РєРѕРґРёСЂРѕРІРєСѓ 'cp1251' СЃ РѕР±СЂР°Р±РѕС‚РєРѕР№ РѕС€РёР±РѕРє РїРѕ РїСЂР°РІРёР»Сѓ errors
-    СЃРѕРіР»Р°СЃРЅРѕ https://docs.python.org/2/library/codecs.html#codec-base-classes
-
-    :param s: СЃС‚СЂРѕРєР° РёР»Рё Р»СЋР±РѕР№ РґСЂСѓРіРѕР№ РѕР±СЉРµРєС‚
-    :type s: *
-    :param encoding: РІС…РѕРґРЅР°СЏ РєРѕРґРёСЂРѕРІРєР°
-    :type encoding: str
-    :param errors: РІР°СЂРёР°РЅС‚С‹ РѕР±СЂР°Р±РѕС‚РєРё РѕС€РёР±РѕРє:
-        'strict' - Raise UnicodeError (or a subclass); this is the default
-        'ignore' - Ignore the character and continue with the next
-        'replace'- Replace with a suitable replacement character; Python will use the official U+FFFD
-                   REPLACEMENT CHARACTER for the built-in Unicode codecs on decoding and вЂ?вЂ™ on encoding.
-    :type errors: str
-    :returns:
-    None - РµСЃР»Рё s is None
-    СЃС‚СЂРѕРєР° РІ РєРѕРґРёСЂРѕРІРєРµ cp1251 - РёРЅР°С‡Рµ
-
-    """
-    if s is None:
-        return None
-    return str(str(s), encoding, errors).encode('cp1251', errors)
-
-
 def empty_str_to_null(val):
     """
-        РІРѕР·РІСЂР°С‰Р°РµС‚ None, РµСЃР»Рё СЃС‚СЂРѕРєР° РїСѓСЃС‚Р°СЏ
+        возвращает None, если строка пустая
     """
 
     if val == '':
@@ -126,7 +100,7 @@ def empty_str_to_null(val):
 
 def check_number(val):
     """
-        РџСЂРѕРІРµСЂРєР° СЏРІР»СЏРµС‚СЃСЏ Р»Рё СЃС‚СЂРѕРєР° С‡РёСЃР»РѕРј
+        Проверка является ли строка числом
     """
 
     if val in ('.', '-', '+'):
@@ -143,14 +117,14 @@ def StrToBoolInt(text):
 
 def str_to_bool_int(text):
     """
-        РїРµСЂРµРІРѕРґ СЃС‚СЂРѕРє РІ Р±СѓР»РµРІРѕ Р·РЅР°С‡РµРЅРёРµ
+        перевод строк в булево значение
     """
 
-    if text in ('Р”Р°', 'РќРµС‚', 'Р”Рђ', 'РќР•Рў', 'РґР°', 'РЅРµС‚',
+    if text in ('Да', 'Нет', 'ДА', 'НЕТ', 'да', 'нет',
                 'false', 'true', 'False', 'True', 'FALSE', 'TRUE', True, False):
-        if text in ('Р”Р°', 'Р”Рђ', 'РґР°', 'true', 'True', 'TRUE', True):
+        if text in ('Да', 'ДА', 'да', 'true', 'True', 'TRUE', True):
             return '1'
-        if text in ('РќРµС‚', 'РќР•Рў', 'РЅРµС‚', 'false', 'False', 'FALSE', False):
+        if text in ('Нет', 'НЕТ', 'нет', 'false', 'False', 'FALSE', False):
             return '0'
     else:
         return text
@@ -159,13 +133,13 @@ def str_to_bool_int(text):
 def BarcodeToDic(wbdic, barcode, unit, factor=None, uweight=None,
                  ulength=None, uheight=None, uwidth=None, characteristic=None, characteristic_id=None):
     """
-        РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РЁРљ РІ СѓРґРѕР±РЅСѓСЋ РґР»СЏ РёРјРїСЂС‚Р° СЃС‚СЂСѓРєС‚СѓСЂСѓ
+        Преобразование ШК в удобную для импрта структуру
     """
 
     barcode = barcode.strip()
     '''
-        РїСЂРѕРІРµСЂРєР° РЅР° РґР»РёРЅРЅСѓ РЁРљ(РїСЂРѕРїСѓСЃРєР°С‚СЊ С‚РѕР»СЊРєРѕ РјРµРЅСЊС€Рµ 25)
-        РЁРљ РЅРµ РґРѕР»Р¶РµРЅ СЃРѕРґРµСЂР¶Р°С‚СЊ РїСЂРѕР±РµР»РѕРІ
+        проверка на длинну ШК(пропускать только меньше 25)
+        ШК не должен содержать пробелов
     '''
 
     if (len(barcode) > 25) or (' ' in barcode):
@@ -190,33 +164,9 @@ def BarcodeToDic(wbdic, barcode, unit, factor=None, uweight=None,
     return wbdic
 
 
-def check_unic_barcode(barcode_uses, barcode):
-    """
-    РџСЂРѕРІРµСЂРєР° РЅР° СѓРЅРёРєР°Р»СЊРЅС‹Рµ РЁРљ
-    @param barcode_uses: 
-    @param barcode: 
-    @return: barcode
-    """
-
-    try:
-        int(barcode)
-    except:
-        return None
-
-    if len(barcode_uses) > 0 :
-        for itm in barcode_uses:
-            if barcode == itm:
-                return False, barcode_uses
-        barcode_uses.append(barcode)
-        return True, barcode_uses
-    else:
-        barcode_uses.append(barcode)
-    return True, barcode_uses
-
-
 def unit_to_list(u_list, name):
     """
-        РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РµРґ РёР·РјРµСЂРµРЅРёСЏ РІ СЃРїРёСЃРѕРє
+        Преобразование ед измерения в список
     """
 
     for itm in u_list:
@@ -228,7 +178,7 @@ def unit_to_list(u_list, name):
 
 def list_create_unique(name_list, name_itm):
     """
-        РЎРѕР·РґР°РЅРёРµ СѓРЅРёРєР°Р»СЊРЅРѕРіРѕ СЃРїРёСЃРєР°
+        Создание уникального списка
     """
     if name_list:
         for itm in name_list:
@@ -263,7 +213,7 @@ def TimeStampToDateTime(timestamp):
 
 def TracebackLog(message=''):
     """
-        РћР±СЂР°Р±РѕС‚РєР° РёСЃРєР»СЋС‡РµРЅРёР№
+        Обработка исключений
     """
 
     exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -280,29 +230,29 @@ def TracebackLog(message=''):
 
 def translit_to_ident(text, trunc_punctuation=False):
     """
-        РўСЂР°РЅСЃР»РёС‚РµСЂР°С†РёСЏ С‚РµРєСЃС‚Р° СЃ СЂСѓСЃСЃРєРѕРіРѕ Рё СѓРєСЂР°РёРЅСЃРєРѕРіРѕ Р°Р»С„Р°РІРёС‚Р° РІ Р»Р°С‚РёРЅРёС†Сѓ РґР»СЏ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ РІ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂС‹.
-        РњРѕР¶РµС‚ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊСЃСЏ РїСЂРё РіРµРЅРµСЂР°С†РёРё РёРјРµРЅРё СЃР»РѕСЏ Рё Р»РѕРіРёРЅР°.
-        Р•СЃР»Рё РїР°СЂР°РјРµС‚СЂ truncPunctuation=True, С‚Рѕ РІСЃРµ СЃРёРјРІРѕР»С‹, РєСЂРѕРјРµ Р±СѓРєРІРµРЅРЅРѕ-С†РёС„СЂРѕРІС‹С…, СѓСЂРµР·Р°СЋС‚СЃСЏ,
-        РёРЅР°С‡Рµ СЌС‚Рё СЃРёРјРІРѕР»С‹ (РёР»Рё Р»СЋР±Р°СЏ РёС… РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚СЊ) Р·Р°РјРµРЅСЏСЋС‚СЃСЏ РѕРґРёРЅРѕС‡РЅС‹Рј СЃРёРјРІРѕР»РѕРј РїРѕРґС‡РµСЂРєРёРІР°РЅРёСЏ (_).
+        Транслитерация текста с русского и украинского алфавита в латиницу для преобразования в идентификаторы.
+        Может использоваться при генерации имени слоя и логина.
+        Если параметр truncPunctuation=True, то все символы, кроме буквенно-цифровых, урезаются,
+        иначе эти символы (или любая их последовательность) заменяются одиночным символом подчеркивания (_).
     """
 
-    ''' РЎР»РѕРІР°СЂРёРє РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёР№ '''
-    dic = {'Рђ': 'A', 'Р‘': 'B', 'Р’': 'V', 'Р“': 'G', 'Р”': 'D', 'Р•': 'E', 'РЃ': 'YO', 'Р–': 'ZH',
-           'Р—': 'Z', 'Р': 'I', 'Р™': 'Y', 'Рљ': 'K', 'Р›': 'L', 'Рњ': 'M', 'Рќ': 'N', 'Рћ': 'O',
-           'Рџ': 'P', 'Р ': 'R', 'РЎ': 'S', 'Рў': 'T', 'РЈ': 'U', 'Р¤': 'F', 'РҐ': 'KH', 'Р¦': 'TS',
-           'Р§': 'Ch', 'РЁ': 'Sh', 'Р©': 'Sch', 'РЄ': '',
-           'Р«': 'Y', 'Р¬': '', 'Р­': 'E', 'Р®': 'Yu', 'РЇ': 'Ya',
-           'Тђ': 'G',
-           'Р„': 'E',
-           'Р‡': 'I',
-           'Р°': 'a', 'Р±': 'b', 'РІ': 'v', 'Рі': 'g', 'Рґ': 'd', 'Рµ': 'e', 'С‘': 'yo', 'Р¶': 'zh', 'Р·': 'z', 'Рё': 'i',
-           'Р№': 'y', 'Рє': 'k', 'Р»': 'l', 'Рј': 'm',
-           'РЅ': 'n', 'Рѕ': 'o', 'Рї': 'p', 'СЂ': 'r', 'СЃ': 's', 'С‚': 't', 'Сѓ': 'u', 'С„': 'f', 'С…': 'kh', 'С†': 'ts',
-           'С‡': 'ch', 'С€': 'sh', 'С‰': 'sch', 'СЉ': '',
-           'С‹': 'y', 'СЊ': '', 'СЌ': 'e', 'СЋ': 'yu', 'СЏ': 'ya',
-           'Т‘': 'g',
-           'С”': 'e',
-           'С—': 'yi',
+    ''' Словарик преобразований '''
+    dic = {'А': 'A', 'Б': 'B', 'В': 'V', 'Г': 'G', 'Д': 'D', 'Е': 'E', 'Ё': 'YO', 'Ж': 'ZH',
+           'З': 'Z', 'И': 'I', 'Й': 'Y', 'К': 'K', 'Л': 'L', 'М': 'M', 'Н': 'N', 'О': 'O',
+           'П': 'P', 'Р': 'R', 'С': 'S', 'Т': 'T', 'У': 'U', 'Ф': 'F', 'Х': 'KH', 'Ц': 'TS',
+           'Ч': 'Ch', 'Ш': 'Sh', 'Щ': 'Sch', 'Ъ': '',
+           'Ы': 'Y', 'Ь': '', 'Э': 'E', 'Ю': 'Yu', 'Я': 'Ya',
+           'Ґ': 'G',
+           'Є': 'E',
+           'Ї': 'I',
+           'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo', 'ж': 'zh', 'з': 'z', 'и': 'i',
+           'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm',
+           'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u', 'ф': 'f', 'х': 'kh', 'ц': 'ts',
+           'ч': 'ch', 'ш': 'sh', 'щ': 'sch', 'ъ': '',
+           'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya',
+           'ґ': 'g',
+           'є': 'e',
+           'ї': 'yi',
            '0': '0',
            '1': '1',
            '2': '2',
@@ -315,7 +265,7 @@ def translit_to_ident(text, trunc_punctuation=False):
            '9': '9'}
 
     result = ''
-    for i in range(len(text)):
+    for i in xrange(len(text)):
         if text[i] in dic:
             result += dic[text[i]]
         else:
@@ -327,7 +277,7 @@ def translit_to_ident(text, trunc_punctuation=False):
 
 def unpack_file(file_name):
     """
-        Р Р°СЃРїР°РєРѕРІРєР° С„Р°Р№Р»Р° Р°СЂС…РёРІР°
+        Распаковка файла архива
     """
 
     res = {}
@@ -343,7 +293,7 @@ def unpack_file(file_name):
 
 def pack_file(file_name, file_pack):
     """
-        РЈРїР°РєРѕРІРєР° С„Р°Р№Р»Р°
+        Упаковка файла
     """
 
     result = True
@@ -361,7 +311,7 @@ def pack_file(file_name, file_pack):
 
 def pack_dir(dir_name, dir_pack):
     """
-        РЈРїР°РєРѕРІРєР° С„Р°Р№Р»Р°
+        Упаковка файла
     """
 
     result = True
@@ -379,7 +329,7 @@ def pack_dir(dir_name, dir_pack):
 
 def get_first_file_mask(path, mask):
     """
-        РџРѕР»СѓС‡РµРЅРёРµ СЃР°РјРѕРіРѕ СЃС‚Р°СЂРѕРіРѕ С„Р°Р№Р»Р° РІ РїР°РїРєРµ
+        Получение самого старого файла в папке
     """
 
     file_list = sorted(glob.glob(path + '/' + mask), key=os.path.getmtime)
@@ -389,10 +339,10 @@ def get_first_file_mask(path, mask):
 
 def check_result(result, name_class):
     """
-        РџСЂРѕРІРµСЂРєР° СЂРµР·СѓР»СЊС‚Р°С‚Р° РєР»Р°СЃСЃР°
-        РёСЃРїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃСЏ Р±СѓРґРµС‚ РєР°Рє РґРµРєР°СЂР°С‚РѕСЂ.
-        Р•СЃР»Рё РІ РєР»Р°СЃСЃРµ РїСЂРѕРїСѓСЃС‚РёР»Рё РѕР±СЂР°Р±РѕС‚РєСѓ,
-        С‚Рѕ
+        Проверка результата класса
+        использователься будет как декаратор.
+        Если в классе пропустили обработку,
+        то
     """
 
     if result != krconst.plugin_ok:
@@ -401,7 +351,7 @@ def check_result(result, name_class):
 
 def convert1cxml(inpfilexml):
     """
-        РљРѕРЅРІРµСЂС‚Р°С†РёСЏ СЃРїСЂР°РІРѕС‡РЅРёРєР° СЃРѕС‚СЂСѓРґРЅРёРєРѕРІ РёР· 1РЎ С„РѕСЂРјР°С‚Р° РІ RBS
+        Конвертация справочника сотрудников из 1С формата в RBS
     """
 
     output = {'from': None, 'to': None, 'insms': None, 'outsms': None, 'xml': None}
@@ -412,18 +362,18 @@ def convert1cxml(inpfilexml):
 
     file_obmena = doc.childNodes[0]
 
-    objects = [x for x in file_obmena.childNodes if x.nodeType == 1 and x.nodeName == 'РћР±СЉРµРєС‚']
+    objects = [x for x in file_obmena.childNodes if x.nodeType == 1 and x.nodeName == u'Объект']
 
     people_objects = [
         x for x in objects
-        if x.getAttribute('РўРёРї') == 'РЎРїСЂР°РІРѕС‡РЅРёРєРЎСЃС‹Р»РєР°.РЎРѕС‚СЂСѓРґРЅРёРєРёРћСЂРіР°РЅРёР·Р°С†РёР№'
-        and x.getAttribute('РРјСЏРџСЂР°РІРёР»Р°') == 'РЎРѕС‚СЂСѓРґРЅРёРєРёРћСЂРіР°РЅРёР·Р°С†РёР№'
+        if x.getAttribute(u'Тип') == u'СправочникСсылка.СотрудникиОрганизаций'
+        and x.getAttribute(u'ИмяПравила') == u'СотрудникиОрганизаций'
     ]
 
     dolgn_objects = [
         x for x in objects
-        if x.getAttribute('РўРёРї') == 'РЎРїСЂР°РІРѕС‡РЅРёРєРЎСЃС‹Р»РєР°.Р”РѕР»Р¶РЅРѕСЃС‚РёРћСЂРіР°РЅРёР·Р°С†РёР№'
-        and x.getAttribute('РРјСЏРџСЂР°РІРёР»Р°') == 'Р”РѕР»Р¶РЅРѕСЃС‚РёРћСЂРіР°РЅРёР·Р°С†РёР№'
+        if x.getAttribute(u'Тип') == u'СправочникСсылка.ДолжностиОрганизаций'
+        and x.getAttribute(u'ИмяПравила') == u'ДолжностиОрганизаций'
     ]
     dict_dolgn = convert1cxml_get_dolgn(dolgn_objects)
 
@@ -447,32 +397,32 @@ def convert1cxml(inpfilexml):
         group_value = ''
         npp = ''
 
-        #Р¤РРћ
+        #ФИО
 
-        fio_m = convert1cxml_get_val(ppl, 'РќР°РёРјРµРЅРѕРІР°РЅРёРµ')
+        fio_m = convert1cxml_get_val(ppl, u'Наименование')
 
         #GUID and CODE, NAME DOLGN
-        dict_d = convert1cxml_get_guid_code(ppl, 'РўРµРєСѓС‰Р°СЏР”РѕР»Р¶РЅРѕСЃС‚СЊРљРѕРјРїР°РЅРёРё')
+        dict_d = convert1cxml_get_guid_code(ppl, u'ТекущаяДолжностьКомпании')
         name_d = convert1cxml_find_dolgn(dict_dolgn, dict_d['uid'])
         #GUID and CODE MAN
-        dict_m = convert1cxml_get_guid_code(ppl, 'Р¤РёР·Р»РёС†Рѕ')
+        dict_m = convert1cxml_get_guid_code(ppl, u'Физлицо')
 
         #deletemarker
-        del_value = convert1cxml_get_val(ppl, 'РџРѕРјРµС‚РєР°РЈРґР°Р»РµРЅРёСЏ')
+        del_value = convert1cxml_get_val(ppl, u'ПометкаУдаления')
 
         #GROUP
-        gr_nodes = [x for x in ppl.childNodes if x.nodeType == 1 and x.nodeName == 'РЎРІРѕР№СЃС‚РІРѕ' and x.getAttribute('РРјСЏ') == 'Р¤РёР·Р»РёС†Рѕ']
+        gr_nodes = [x for x in ppl.childNodes if x.nodeType == 1 and x.nodeName == u'Свойство' and x.getAttribute(u'Имя') == u'Физлицо']
         for node in gr_nodes:
-            link_nodes = [x for x in node.childNodes if x.nodeType == 1 and x.nodeName == 'РЎСЃС‹Р»РєР°']
+            link_nodes = [x for x in node.childNodes if x.nodeType == 1 and x.nodeName == u'Ссылка']
             for link in link_nodes:
-                group_value = convert1cxml_get_val(link, 'Р­С‚РѕР“СЂСѓРїРїР°')
+                group_value = convert1cxml_get_val(link, u'ЭтоГруппа')
 
         #POSITION
-        pos_nodes = [x for x in ppl.childNodes if x.nodeType == 1 and x.nodeName == 'РЎРІРѕР№СЃС‚РІРѕ' and x.getAttribute('РРјСЏ') == 'Р”РѕР»Р¶РЅРѕСЃС‚СЊ']
+        pos_nodes = [x for x in ppl.childNodes if x.nodeType == 1 and x.nodeName == u'Свойство' and x.getAttribute(u'Имя') == u'Должность']
         for node in pos_nodes:
-            link_nodes = [x for x in node.childNodes if x.nodeType == 1 and x.nodeName == 'РЎСЃС‹Р»РєР°']
+            link_nodes = [x for x in node.childNodes if x.nodeType == 1 and x.nodeName == u'Ссылка']
             for link in link_nodes:
-                npp = link.getAttribute('РќРїРї').encode('utf-8')
+                npp = link.getAttribute(u'Нпп').encode('utf-8')
 
         str_man = '<man realcode="%s" name="%s" deletemarker="%s" parentcode="%s" parent="%s" '\
                    'parentgroup="%s" group="%s" code="%s" position="%s" '\
@@ -485,12 +435,12 @@ def convert1cxml(inpfilexml):
 
     str_itog = str_itog + '\t' + '\t' + '</mans>' + '\n' + '\t' + '</root>'
 
-    data_objects = [x for x in file_obmena.childNodes if x.nodeType == 1 and x.nodeName == 'Р”Р°РЅРЅС‹РµРџРѕРћР±РјРµРЅСѓ']
+    data_objects = [x for x in file_obmena.childNodes if x.nodeType == 1 and x.nodeName == u'ДанныеПоОбмену']
     for x in data_objects:
-        output['to'] = x.getAttribute('РљРѕРјСѓ').encode('utf-8')
-        output['from'] = x.getAttribute('РћС‚РљРѕРіРѕ').encode('utf-8')
-        output['outsms'] = x.getAttribute('РќРѕРјРµСЂРСЃС…РѕРґСЏС‰РµРіРѕРЎРѕРѕР±С‰РµРЅРёСЏ').encode('utf-8')
-        output['insms'] = x.getAttribute('РќРѕРјРµСЂР’С…РѕРґСЏС‰РµРіРѕРЎРѕРѕР±С‰РµРЅРёСЏ').encode('utf-8')
+        output['to'] = x.getAttribute(u'Кому').encode('utf-8')
+        output['from'] = x.getAttribute(u'ОтКого').encode('utf-8')
+        output['outsms'] = x.getAttribute(u'НомерИсходящегоСообщения').encode('utf-8')
+        output['insms'] = x.getAttribute(u'НомерВходящегоСообщения').encode('utf-8')
 
     output['xml'] = str_itog
 
@@ -499,18 +449,18 @@ def convert1cxml(inpfilexml):
 
 def convert1cxml_get_guid_code(xml, name):
     """
-        РџРѕР»СѓС‡РµРЅРёРµ guid Рё code РёР· С„Р°Р№Р»Р° 1РЎ
+        Получение guid и code из файла 1С
     """
 
     #GUID and CODE DOLGN
     uid = ''
     code = ''
-    id_nodes = [x for x in xml.childNodes if x.nodeType == 1 and x.nodeName == 'РЎРІРѕР№СЃС‚РІРѕ' and x.getAttribute('РРјСЏ') == name]
+    id_nodes = [x for x in xml.childNodes if x.nodeType == 1 and x.nodeName == u'Свойство' and x.getAttribute(u'Имя') == name]
     for node in id_nodes:
-        link_nodes = [x for x in node.childNodes if x.nodeType == 1 and x.nodeName == 'РЎСЃС‹Р»РєР°']
+        link_nodes = [x for x in node.childNodes if x.nodeType == 1 and x.nodeName == u'Ссылка']
         for link in link_nodes:
-            uid = convert1cxml_get_val(link, '{РЈРЅРёРєР°Р»СЊРЅС‹Р№РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ}')
-            code = convert1cxml_get_val(link, 'РљРѕРґ')
+            uid = convert1cxml_get_val(link, u'{УникальныйИдентификатор}')
+            code = convert1cxml_get_val(link, u'Код')
 
     result = {'uid': uid, 'code': code}
     return result
@@ -518,14 +468,14 @@ def convert1cxml_get_guid_code(xml, name):
 
 def convert1cxml_get_val(link, name):
     """
-        РџРѕР»СѓС‡РµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ РїРѕ РёРјРµРЅРё
+        Получение значения по имени
     """
 
     val = None
 
-    id_nodess = [x for x in link.childNodes if x.nodeType == 1 and x.nodeName == 'РЎРІРѕР№СЃС‚РІРѕ' and x.getAttribute('РРјСЏ') == name]
+    id_nodess = [x for x in link.childNodes if x.nodeType == 1 and x.nodeName == u'Свойство' and x.getAttribute(u'Имя') == name]
     for id_node in id_nodess:
-        id_leafs = [x for x in id_node.childNodes if x.nodeType == 1 and x.nodeName == 'Р—РЅР°С‡РµРЅРёРµ']
+        id_leafs = [x for x in id_node.childNodes if x.nodeType == 1 and x.nodeName == u'Значение']
         for leaf in id_leafs:
             val = [x.nodeValue for x in leaf.childNodes if x.nodeType == 3][0].encode('utf-8')
     return val
@@ -533,23 +483,23 @@ def convert1cxml_get_val(link, name):
 
 def convert1cxml_get_dolgn(dolgn_objects):
     """
-        РџРѕР»СѓС‡РµРЅРёРµ СЃР»РѕРІР°СЂСЏ СЃ РґРѕР»Р¶РЅРѕСЃС‚СЏРјРё
+        Получение словаря с должностями
     """
 
     dict_dolgn = []
     for dlgn in dolgn_objects:
-        link_nodes = [x for x in dlgn.childNodes if x.nodeType == 1 and x.nodeName == 'РЎСЃС‹Р»РєР°']
+        link_nodes = [x for x in dlgn.childNodes if x.nodeType == 1 and x.nodeName == u'Ссылка']
         for link in link_nodes:
-            uid = convert1cxml_get_val(link, '{РЈРЅРёРєР°Р»СЊРЅС‹Р№РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ}')
-            code = convert1cxml_get_val(link, 'РљРѕРґ')
-        name = convert1cxml_get_val(dlgn, 'РќР°РёРјРµРЅРѕРІР°РЅРёРµ')
+            uid = convert1cxml_get_val(link, u'{УникальныйИдентификатор}')
+            code = convert1cxml_get_val(link, u'Код')
+        name = convert1cxml_get_val(dlgn, u'Наименование')
         dict_dolgn.append({'uid': uid, 'code': code, 'name':name})
     return dict_dolgn
 
 
 def convert1cxml_find_dolgn(dict_dolgn, uid):
     """
-        РџРѕРёСЃРє РЅР°РёРјРµРЅРѕРІР°РЅРёСЏ РґРѕР»Р¶РЅРѕСЃС‚Рё РїРѕ guid
+        Поиск наименования должности по guid
     """
 
     name_dolgn = ''
@@ -561,7 +511,7 @@ def convert1cxml_find_dolgn(dict_dolgn, uid):
 
 def delete_files_by_mask(path, mask_files, date):
     """
-        РЈРґР°Р»РµРЅРёРµ С„Р°Р№Р»РѕРІ РїРѕ РјР°СЃРєРµ Рё РґР°С‚Рµ РёР·РјРµРЅРµРЅРёСЏ
+        Удаление файлов по маске и дате изменения
     """
 
     res = None
@@ -571,7 +521,7 @@ def delete_files_by_mask(path, mask_files, date):
         file_list = sorted(glob.glob(path + '/' + mask), key=os.path.getmtime)
         for itm in file_list:
             if os.path.isfile(itm):
-                #РїРѕР»СѓС‡РёРј РґР°С‚Сѓ СЃРѕР·РґР°РЅРёСЏ Рё СЃСЂР°РІРЅРёРј
+                #получим дату создания и сравним
                 if os.path.getmtime(itm) < date:
                     try:
                         os.unlink(itm)
@@ -588,7 +538,7 @@ def delete_files_by_mask(path, mask_files, date):
 
 def current_time(db, layer_code='', time_zone=None):
     """
-        РџРѕР»СѓС‡РµРЅРёРµ С‚РµРєСѓС‰РµРіРѕ РІСЂРµРјРµРЅРё СЃ СѓС‡РµС‚РѕРј time zone
+        Получение текущего времени с учетом time zone
     """
     if layer_code != '':
         if not time_zone:
@@ -599,32 +549,13 @@ def current_time(db, layer_code='', time_zone=None):
                             fetch='one')
             return res['DATETIMEZONE']
         else:
-            return datetime.now() + timedelta(hours=time_zone)
+            return now() + timedelta(hours=time_zone)
     else:
-        return datetime.now()
-
-def current_date(db, layer_code='', time_zone=None):
-    """
-        РџРѕР»СѓС‡РµРЅРёРµ С‚РµРєСѓС‰РµР№ РґР°С‚С‹ СЃ СѓС‡РµС‚РѕРј time zone РґР»
-    """
-    # todo СЃРґРµР»Р°С‚СЊ РїРѕР»СѓС‡РµРЅРёРµ С‚РµРєСѓС‰РµР№ РґР°С‚С‹ РµСЃР»Рё РЅРµС‚ СЃР»РѕСЏ
-    if layer_code != '':
-        if not time_zone:
-            sql_text = 'select * from MY_GETDATETIME(?,?)'
-            sql_params = [None, 'D']
-            res = db.dbExec(sql_text,
-                            params=sql_params,
-                            fetch='one')
-            return res['DATETIMEZONE']
-        else:
-            return datetime.now() + timedelta(hours=time_zone)
-    else:
-        return datetime.now()
-
+        return now()
 
 def current_time_zone(db, layer_code=''):
     """
-        РџРѕР»СѓС‡РµРЅРёРµ С‚РµРєСѓС‰РµР№ Р·РѕРЅС‹
+        Получение текущей зоны
     """
 
     if layer_code != '':
@@ -636,69 +567,3 @@ def current_time_zone(db, layer_code=''):
         return res['timezone']
     else:
         return 0
-
-
-def json_encode_1251(json_dict):
-    """
-    РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РєР»СЋС‡РµР№ Рё Р·РЅР°С‡РµРЅРёР№ dict Рє cp1251
-    :param json_dict: РІС…РѕРґСЏС‰РёР№ dict
-    :return: РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРЅС‹Р№ dict
-    """
-    res = {}
-    if json is not None:
-        for key, value in json_dict.items():
-            key = key.encode('cp1251')
-            if isinstance(value, six.string_types):
-                value = value.encode('cp1251')
-            res[key] = value
-    return res
-
-def barcode_int(barcode):
-    """
-    РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёС‚Рµ РЁР• Рє С‡РёСЃР»РѕРІРѕРјСѓ Р·РЅР°С‡Р°РЅРёСЋ
-    @param barcode: РЁРљ
-    @return:
-    """
-
-    result = ''
-    for itm in barcode.split():
-        if isinstance(itm, int):
-            result += itm
-
-    return result
-
-def convert_unix_date_to_date(unix_date):
-    """
-    РљРѕРЅРІРµСЂС‚Р°С†РёСЏ unix РґР°С‚С‹ РІСЂРµРјРµРЅРё РІ Р‘Р”
-    @param unix_date: 
-    @return: 
-    """
-
-    unix_timestamp = int(unix_date)
-    # utc_time = time.gmtime(unix_timestamp)
-    local_time = time.localtime(unix_timestamp/1000)
-    return (time.strftime("%d.%m.%Y %H:%M:%S", local_time))
-
-def convToUTF8(s, encoding='cp1251', errors='replace'):
-    """РџСЂРµРѕР±СЂР°Р·СѓРµС‚ СЃС‚СЂРѕРєСѓ РІ РєРѕРґРёСЂРѕРІРєРµ encoding РІ РєРѕРґРёСЂРѕРІРєСѓ 'utf-8' СЃ РѕР±СЂР°Р±РѕС‚РєРѕР№ РѕС€РёР±РѕРє РїРѕ РїСЂР°РІРёР»Сѓ errors
-    СЃРѕРіР»Р°СЃРЅРѕ https://docs.python.org/2/library/codecs.html#codec-base-classes
-
-    :param s: СЃС‚СЂРѕРєР° РёР»Рё Р»СЋР±РѕР№ РґСЂСѓРіРѕР№ РѕР±СЉРµРєС‚
-    :type s: *
-    :param encoding: РІС…РѕРґРЅР°СЏ РєРѕРґРёСЂРѕРІРєР°
-    :type encoding: str
-    :param errors: РІР°СЂРёР°РЅС‚С‹ РѕР±СЂР°Р±РѕС‚РєРё РѕС€РёР±РѕРє:
-        'strict' - Raise UnicodeError (or a subclass); this is the default
-        'ignore' - Ignore the character and continue with the next
-        'replace'- Replace with a suitable replacement character; Python will use the official U+FFFD 
-                   REPLACEMENT CHARACTER for the built-in Unicode codecs on decoding and вЂ?вЂ™ on encoding.
-    :type errors: str
-    :returns:
-    None - РµСЃР»Рё s is None
-    СЃС‚СЂРѕРєР° РІ РєРѕРґРёСЂРѕРІРєРµ utf-8 - РёРЅР°С‡Рµ
-
-    """
-    if s is None:
-        return None
-    return str(str(s), encoding, errors).encode('utf-8', errors)
-

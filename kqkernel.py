@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
+# -*- coding: cp1251-*
 """
     swat 11.12.2014
     version 0.0.2.3
-    РЇРґСЂРѕ СЃРµСЂРІРµСЂР°-Р·Р°РґР°С‡
+    Ядро сервера-задач
 """
 
 import time
@@ -10,6 +10,7 @@ import threading
 import os
 import sys
 import os.path
+from mx.DateTime import now
 
 import krconst
 import krconst as k
@@ -33,9 +34,9 @@ VERSION = '0.0.3.0'
 
 class Layer(object):
     """
-        РљР»Р°СЃСЃ РїСЂРѕРІРµСЂРєРё РЅР° РїР°СЂР°РјРµС‚СЂС‹ СЂР°Р±РѕС‚С‹ СЃРµСЂРІРµСЂР°-Р·Р°РґР°С‡
-        1. РћР±С‹С‡РЅРЅС‹Р№ СЂРµР¶РёРј
-        2. СЂР°Р±РѕС‚Р° СЃРѕ СЃР»РѕСЏРјРё
+        Класс проверки на параметры работы сервера-задач
+        1. Обычнный режим
+        2. работа со слоями
     """
 
     __db_engine = None
@@ -48,7 +49,7 @@ class Layer(object):
         self.db_user = db_user
         self.db_pass = db_pass
         self.engine_conf = conf.KConfig(name_engine_db)
-        ''' РїСЂРѕРІРµСЂРёРј РІ РєР°РєРѕРј СЂРµР¶РёРјРµ РґРѕР»Р¶РµРЅ СЂР°Р±РѕС‚Р°С‚СЊ СЃРµСЂРІРµСЂ-Р·Р°РґР°С‡  '''
+        ''' проверим в каком режиме должен работать сервер-задач  '''
         self.engine_conf.get_config_file()
         self.engine_conf.get_config_layer()
         if self.engine_conf.layers_work:
@@ -57,7 +58,7 @@ class Layer(object):
                 self.engine_conf.db_user = db_user
             if db_pass:
                 self.engine_conf.db_pass = db_pass
-            ''' РџРѕРґРєР»СЋС‡РёРјСЃСЏ Рє Engine РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ СЂР°Р±РѕС‚С‹ '''
+            ''' Подключимся к Engine для получения параметров работы '''
             self.__db_engine = db.QueryDB(self.engine_conf)
             if self.__db_engine.connect:
                 self.group_name = group_name
@@ -66,17 +67,16 @@ class Layer(object):
                     self.__layers_start(layers_db, self.engine_conf, db_user, db_pass)
                     self.__subscribe_event()
                 else:
-                    print(c.m_e_layer_get_layers % group_name)
+                    print c.m_e_layer_get_layers % group_name
             else:
-                print(c.m_e_layer_not_db_engine % self.engine_conf.db_path)
+                print c.m_e_layer_not_db_engine % self.engine_conf.db_path
         else:
-            print(c.m_e_layer_config)
+            print c.m_e_layer_config
 
     def __layers_get_info(self, group_name):
         """
-            РџРѕР»СѓС‡РµРЅРёРµ СЃР»РѕРµРІ
+            Получение слоев
         """
-        print(group_name)
 
         sql_text = 'select * from QUE_LAYERS_GET_BY_GROUP(?) l'
         sql_params = [group_name]
@@ -87,7 +87,7 @@ class Layer(object):
 
     def __layers_start(self, layers_db, engine_conf, db_user, db_pass):
         """
-            Р—Р°РїСѓСЃРє СЃР»РѕСЏ
+            Запуск слоя
         """
 
         for layer in layers_db:
@@ -101,13 +101,13 @@ class Layer(object):
     @staticmethod
     def __layer_start(layer_code, server_code, engine_conf, db_user, db_pass, sn_name):
         """
-        РЎС‚Р°СЂС‚ СЃР»РѕСЏ
+        Старт слоя
         @param layer_code:
         @param server_code:
         @param engine_conf:
         @param db_user:
         @param db_pass:
-        @param sn_name: РёРјСЏ СЃРµСЂРІРµСЂР°РґР° РќРѕРґ
+        @param sn_name: имя серверада Нод
         @return:
         """
         thread_kernel = QKernelThread(layer_code,
@@ -121,7 +121,7 @@ class Layer(object):
 
     def __subscribe_event(self):
         """
-        РџРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёРµ
+        Подписка на событие
         @return:
         """
         thread = FBEventThread(self.__db_engine.connect, 'ENGINE_QUE_' + self.group_name.upper(), self.__fb_event_callback)
@@ -131,19 +131,19 @@ class Layer(object):
 
     def __fb_event_callback(self):
         """
-        РџРѕРјРµРЅСЏР»РёСЃСЊ СЃР»РѕРё РґР»СЏ СЂРѕР±РѕС‚Р°, РїСЂРѕР±СѓРµРј
+        Поменялись слои для робота, пробуем
         @return:
         """
-        # РЎРїРёСЃРѕРє Р°РєС‚СѓР°Р»СЊРЅС‹С… СЃР»РѕРµРІ
+        # Список актуальных слоев
         layers_from_db = self.__layers_get_info(self.group_name)
-        # РЎРїРёСЃРѕРє СЃР»РѕРµРІ, РєРѕС‚РѕСЂС‹Рµ СѓР¶Рµ СЂР°Р±РѕС‚Р°СЋС‚
+        # Список слоев, которые уже работают
         exists_layers = []
         for itm in threading.enumerate():
             task_name = itm.getName()
             if task_name != 'MainThread' and task_name.startswith('MainThread'):
                 layer_code = task_name.replace('MainThread', '')
                 exists_layers.append(layer_code)
-        # РџСЂРѕРІРµСЂСЏРµРј РЅРѕРІС‹Рµ Рё Р·Р°РїСѓСЃРєР°РµРј
+        # Проверяем новые и запускаем
         if layers_from_db is not None:
             for layer in layers_from_db:
                 layer_code = layer['LAYER_CODE']
@@ -152,8 +152,8 @@ class Layer(object):
                 except ValueError:
                     index = -1
                 if index < 0:
-                    # РќРѕРІС‹Р№ СЃР»РѕР№
-                    print('Layer %s is going to start by event' % layer_code)
+                    # Новый слой
+                    print 'Layer %s is going to start by event' % layer_code
                     self.__layer_start(layer_code,
                                        layer['SERVER_CODE'],
                                        self.engine_conf,
@@ -162,7 +162,7 @@ class Layer(object):
                                        layer['LB_SN_DOMAIN'])
                 else:
                     exists_layers.remove(layer_code)
-        # Р’ exists_layers РѕСЃС‚Р°Р»РёСЃСЊ СЃР»РѕРё РґР»СЏ РѕСЃС‚Р°РЅРѕРІРєРё
+        # В exists_layers остались слои для остановки
         for itm in threading.enumerate():
             task_name = itm.getName()
             if task_name != 'MainThread' and task_name.startswith('MainThread'):
@@ -172,14 +172,14 @@ class Layer(object):
                 except ValueError:
                     index = -1
                 if index > -1:
-                    print('Layer %s is going to stop by event' % layer_code)
+                    print 'Layer %s is going to stop by event' % layer_code
                     itm.kill()
                     exists_layers.remove(layer_code)
 
 
 class QKernelThread(threading.Thread):
     """
-        РљР»Р°СЃСЃ Р·Р°РїСѓСЃРєР° РїРѕС‚РѕРєР° СЃРµСЂРІРµСЂР°-Р·Р°РґР°С‡
+        Класс запуска потока сервера-задач
     """
 
     __server_code = None
@@ -202,7 +202,7 @@ class QKernelThread(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
-        print('db/layer=%s, server code=%s' % (self.__name_db, self.__server_code) + c.kr_term_enter)
+        print 'db/layer=%s, server code=%s' % (self.__name_db, self.__server_code) + c.kr_term_enter
         try:
             a = QKernel(self.__name_db,
                         self.__server_code,
@@ -214,7 +214,7 @@ class QKernelThread(threading.Thread):
                         sn_name=self.__sn_name)
             a.run(kill_event=self.__kill_event)
         except:
-            print(rqu.TracebackLog(''))
+            print rqu.TracebackLog('')
 
     def kill(self):
         self.__kill_event.set()
@@ -257,23 +257,23 @@ class QKernel(object):
         self.lockQueue = {}
         if self.config_read():
             if not self.k_conf.os_version:
-                print('Error get OS version')
+                print 'Error get OS version'
                 return None
             if run_server:
                 self.run()
 
     def run(self, kill_event=None):
         """
-        Р’РЅРµС€РЅРёР№ Р·Р°РїСѓСЃРє СЃРµСЂРІРµСЂР°, РЅРµ РёР· РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂР°
+        Внешний запуск сервера, не из конструктора
         @return:
         """
         self.start_server()
         if self.k_conf.status_server_queue == krconst.kr_statusserver_lostconnect:
-            print('Error connect to DB')
+            print 'Error connect to DB'
         else:
             while self.k_conf.status_server_queue != krconst.kr_statusserver_close:
                 if kill_event is not None:
-                    # РЎСЂР°Р±РѕС‚Р°Р»Р° РѕСЃС‚Р°РЅРѕРІРєР° РїРѕС‚РѕРєР°
+                    # Сработала остановка потока
                     if kill_event.isSet():
                         self.stop_server()
                         break
@@ -295,7 +295,7 @@ class QKernel(object):
 
     def connect_db_server(self):
         """
-            РџРѕРґРєР»СЋС‡РµРЅРёРµ Рє Р‘Р”
+            Подключение к БД
         """
 
         if not self.db:
@@ -303,7 +303,7 @@ class QKernel(object):
 
     def get_server_id(self):
         """
-            РџРѕР»СѓС‡РµРЅРёРµ id СЃРµСЂРІРµСЂР°
+            Получение id сервера
         """
 
         sql_text = 'select rs.queserverid, rs.name, rs.breakenabled, rs.breakfrom, ' \
@@ -318,7 +318,7 @@ class QKernel(object):
             self.q_name = res['name']
 
             if res['logfilename'] and self.k_conf.global_log == 1:
-                log_file_name = res['logfilename'].replace('\\', '/')
+                log_file_name = res['logfilename'].encode('windows-1251').replace('\\', '/')
                 if self.layer_code != '':
                     log_file_name = log_file_name.replace('./log/', './log/' + self.layer_code + '/')
                 self.Logger = RPLogger(cfg=self.k_conf,
@@ -336,7 +336,7 @@ class QKernel(object):
 
     def restart_dangling_turn(self):
         """
-            Р’РѕСЃСЃС‚Р°РЅР°РІР»РёРІР°РµРј Р·Р°РґР°РЅРёСЏ РїРѕСЃР»Рµ РїРµСЂРµР·Р°РїСѓСЃРєР°
+            Восстанавливаем задания после перезапуска
         """
 
         try:
@@ -345,12 +345,12 @@ class QKernel(object):
             self.db.dbExec(sql_text,
                            params=sql_params,
                            fetch='None')
-        except Exception as exc:
-            self.log_server('РћС€РёР±РєР° РїСЂРё РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРё Р·Р°РґР°РЅРёР№ ' + exc[1], krconst.log_error)
+        except Exception, exc:
+            self.log_server('Ошибка при восстановлении заданий ' + exc[1], krconst.log_error)
 
     def start_server(self):
         """
-            РЎС‚Р°СЂС‚ СЃРµСЂРІРµСЂР°
+            Старт сервера
         """
         self.connect_db_server()
         if self.db:
@@ -384,24 +384,24 @@ class QKernel(object):
                     if self.taskQueue:
                         self.create_queue_task()
                 else:
-                    print(k.m_e_server_code_is_none)
+                    print k.m_e_server_code_is_none
             else:
                 self.k_conf.status_server_queue = krconst.kr_statusserver_lostconnect
                 self.k_conf.LostConnectDB = True
-                ''' РµСЃР»Рё РїРµСЂРІС‹Р№ Р·Р°РїСѓСЃРє С‚Рѕ Р»РѕРіР° РµС‰Рµ РЅРµС‚, Рё С‚РѕРіРґР° РїРµС‡Р°С‚Р°РµРј РІ РєРѕРЅСЃРѕР»СЊ, С‡С‚Рѕ Р±С‹ РїРѕРЅСЏС‚СЊ СЃСѓС‚СЊ РѕС€РёР±РєРё '''
+                ''' если первый запуск то лога еще нет, и тогда печатаем в консоль, что бы понять суть ошибки '''
                 try:
                     if self.Logger:
                         self.log_server(self.db.db_message, krconst.log_error)
                     else:
-                        print(self.db.db_message)
+                        print self.db.db_message
                 except:
-                    print(self.db.db_message)
+                    print self.db.db_message
         else:
-            print(k.m_e_db_none)
+            print k.m_e_db_none
 
     def stop_server(self, is_break=False):
         """
-            РћСЃС‚Р°РЅРѕРІРєР° СЃРµСЂРІРµСЂР°
+            Остановка сервера
         """
 
         if self.db:
@@ -410,7 +410,7 @@ class QKernel(object):
                 self.register_status_server('B')
             else:
                 self.register_status_server('0')
-            self.db.close_connect()
+            self.db.CloseConnection()
         self.db = None
 
         ''' stop Thread Plugin and Guard '''
@@ -428,7 +428,7 @@ class QKernel(object):
                                                                 krconst.kr_statusserver_break)) \
                             and (task_name.startswith('GuardConnect'))\
                             and (self.layer_code == '' or task_name.endswith(self.layer_code)):
-                        # РџРµСЂРІС‹Рј РґРѕР»Р¶РµРЅ РѕСЃС‚Р°РЅР°РІР»РёРІР°С‚СЊСЃСЏ guard
+                        # Первым должен останавливаться guard
                         stop_threads.insert(0, {'name': task_name, 'guard': True, 'item': itm})
                         # itm.kill()
                         # self.log_server('Stop GuardConnect: ' + task_name, krconst.log_info)
@@ -443,7 +443,7 @@ class QKernel(object):
 
     def get_queue_task(self):
         """
-            РїРѕР»СѓС‡РµРЅРёРµ Р·Р°РґР°С‡, Рё СЃРѕР·РґР°РЅРёРµ СЃРїРёСЃРєР°
+            получение задач, и создание списка
         """
 
         sql_text = 'select rt.tasktype, rt.code, rt.name, rt.autorun , rt.modulename, rt.quetaskid, rt.moduleid,' \
@@ -486,7 +486,7 @@ class QKernel(object):
 
     def create_queue_task(self):
         """
-            Р—Р°РїСѓСЃРє Р·Р°РґР°С‡
+            Запуск задач
         """
         self.time_zone = current_time_zone(self.db, self.layer_code)
         cur_time = current_time(self.db, self.layer_code)
@@ -514,7 +514,7 @@ class QKernel(object):
                         q_thread.start()
                         self.log_server(krconst.kr_message_startQueueTask % q_thread.getName(), krconst.log_info)
 
-        ''' Р—Р°СѓСЃРє guard '''
+        ''' Зауск guard '''
         guard_connect = False
         for itm in threading.enumerate():
             if itm.getName() == 'GuardConnect' + self.layer_code:
@@ -534,7 +534,7 @@ class QKernel(object):
 
     def log_server(self, message, type_message='INFO'):
         """
-            Р—Р°РїРёСЃСЊ Р»РѕРіР° СЂР°Р±РѕС‚С‹ СЃРµСЂРІРµСЂР°
+            Запись лога работы сервера
         """
 
         if self.k_conf.global_log == 1:
@@ -543,7 +543,7 @@ class QKernel(object):
     @synchronized(q_kernel_db_lock)
     def register_status_server(self, status):
         """
-            РћР±РЅРѕРІР»РµРЅРёРµ СЃС‚Р°С‚СѓСЃР° СЃРµСЂРІРµСЂР°
+            Обновление статуса сервера
         """
 
         if self.k_conf.status_server_queue != krconst.kr_statusserver_lostconnect and self.db is not None:
@@ -553,7 +553,7 @@ class QKernel(object):
                 self.db.dbExec(sql_text,
                                params=sql_params,
                                fetch='none')
-            except Exception as exc:
+            except Exception, exc:
                 self.log_server(krconst.kr_message_error_updateserverstatus, krconst.log_error)
                 if self.db is not None and self.db.db_message:
                     self.log_server(self.db.db_message)
@@ -575,7 +575,7 @@ class QueueThread(threading.Thread):
         self.ConnectLost = False
         self.TaskRule = False
 
-        # СЃРїРёСЃРѕРє РґР»СЏ РїСЂРѕРІРµСЂРєРё РІРµСЂСЃРёР№ С„Р°Р№Р»РѕРІ СЃРµСЂРІРµСЂР°-Р·Р°РґР°С‡
+        # список для проверки версий файлов сервера-задач
         self.versionfile = []
 
         threading.Thread.__init__(self)
@@ -584,7 +584,7 @@ class QueueThread(threading.Thread):
         if not self.dbplug:
             self.dbplug = db.QueryDB(self.parent.k_conf)
             if not self.dbplug.connect:
-                ''' РћС€РёР±РєР° РѕС‚РєСЂС‹С‚РёСЏ РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє Р‘Р” '''
+                ''' Ошибка открытия подключения к БД '''
                 self.parent.log_server(krconst.kr_message_error_openconnect % self.params['name'], c.log_error)
             else:
                 self.check_turn()
@@ -595,7 +595,7 @@ class QueueThread(threading.Thread):
 
     def check_turn(self):
         """
-            РџСЂРѕРІРµСЂРєР° РЅР° РЅР°Р»РёС‡РёРµ Р·Р°РґР°РЅРёСЏ РґР»СЏ Р·Р°РґР°С‡Рё
+            Проверка на наличие задания для задачи
         """
 
         while self.runPlugin \
@@ -618,30 +618,30 @@ class QueueThread(threading.Thread):
             if res or self.params['tasktype'] == '0':
                 self.runPlugin = self.run_plugin()
 
-            ''' РџРѕС‚РµСЂСЏ РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє Р‘Р” '''
+            ''' Потеря подключения к БД '''
             if self.ConnectLost:
                 self.runPlugin = False
                 self.parent.k_conf.LostConnectDB = True
-            # РџРµСЂРµРґ РїРµСЂРµСЂС‹РІРѕРј РїСЂРѕРІРµСЂСЏРµРј, С‡С‚РѕР±С‹ РЅРµ РґРµСЂР¶Р°Р» СЂРµСЃСѓСЂСЃС‹
+            # Перед перерывом проверяем, чтобы не держал ресурсы
             if self.stopPlugin:
                 self.runPlugin = False
             if self.runPlugin:
                 self.sleep_turn()
-                # РџРѕСЃР»Рµ РїРµСЂРµСЂС‹РІР°, РµСЃР»Рё С‡С‚Рѕ-С‚Рѕ РёР·РјРµРЅРёР»РѕСЃСЊ Р·Р° РІСЂРµРјСЏ РїРµСЂРµСЂС‹РІР°
+                # После перерыва, если что-то изменилось за время перерыва
                 if self.stopPlugin:
                     self.runPlugin = False
         if self.dbplug:
-            self.dbplug.close_connect()
+            self.dbplug.CloseConnection()
 
     def sleep_turn(self):
         time.sleep(self.params['interval'])
 
     def run_plugin(self):
         """
-            Р—Р°РїСѓСЃРє РїР»Р°РіРёРЅР°
+            Запуск плагина
         """
 
-        ''' Р•СЃР»Рё СѓРєР°Р·Р°РЅ РјРѕРґСѓР»СЊ, С‚Рѕ РїСЂРѕСЃС‚Рѕ РёРјРїРѕСЂС‚РёСЂСѓРµРј РµРіРѕ. Р”Р°РЅРЅСѓСЋ Р·Р°РґР°С‡Сѓ РѕР±СЂР°Р±Р°С‚С‹РІР°РµС‚ РѕРґРёРЅ РјРѕРґСѓР»СЊ '''
+        ''' Если указан модуль, то просто импортируем его. Данную задачу обрабатывает один модуль '''
         if self.params['filemodule']:
             filename = (self.params['filemodule']).split('.')[0]
             try:
@@ -649,7 +649,7 @@ class QueueThread(threading.Thread):
             except:
                 self.TracebackLog('Error execute plugin ' + filename + ', taskcode=' + self.params['taskcode'])
                 return False
-        ''' РјРѕРґСѓР»СЏ РЅРµС‚, Рё Р·Р°РґР°РЅРёРµ РЅРµ С‚РёРїР° РёРјРїРѕСЂС‚/СЌРєСЃРїРѕСЂС‚ С‚Рѕ РѕС€РёР±РєР°. '''
+        ''' модуля нет, и задание не типа импорт/экспорт то ошибка. '''
         if not self.params['filemodule'] and \
                 self.params['tasktype'] not in ('I', 'E'):
             self.parent.log_server(krconst.m_e_setting_task % self.params['taskcode'], krconst.log_error)
@@ -668,7 +668,7 @@ class QueueThread(threading.Thread):
                 self.ConnectLost = True
             if (res) or (self.params['tasktype'] == '0'):
                 try:
-                    ''' РќРµРїРѕСЃСЂРµРґСЃС‚РІРµРЅРЅС‹Р№ Р·Р°РїСѓСЃРє РїР»Р°РіРёРЅР° '''
+                    ''' Непосредственный запуск плагина '''
                     if self.params['tasktype'] == '0':
                         resqueue = None
                     else:
@@ -679,7 +679,7 @@ class QueueThread(threading.Thread):
                                         'db': self.dbplug,
                                         'queueid': queueid,
                                         'resqueue': resqueue})
-                    ''' РїСЂРѕРІРµСЂСЏРµРј РµСЃР»Рё РЅРµС‚ РјРѕРґСѓР»СЏ Рё С‚РёРї РёРјРїРѕСЂС‚/СЌРєСЃРїРѕСЂС‚, С‚Рѕ РїРѕ РїСЂР°РІРёР»Сѓ РїСЂРѕР±СѓРµРј РѕРїСЂРµРґРµР»РёС‚СЊ РјРѕРґСѓР»СЊ '''
+                    ''' проверяем если нет модуля и тип импорт/экспорт, то по правилу пробуем определить модуль '''
                     if not self.params['filemodule'] \
                             and self.params['tasktype'] in ('I', 'E'):
                         if resqueue['rulemodulefilename']:
@@ -690,7 +690,7 @@ class QueueThread(threading.Thread):
                                 self.TracebackLog('Error execute plugin ' + filename + ', taskcode=' + self.params['taskcode'])
                                 return False
                         else:
-                            ''' РїРѕ РїСЂР°РІРёР»Сѓ РЅРµ РЅР°С€Р»Рё РЅСѓР¶РЅС‹Р№ РјРѕРґСѓР»СЊ '''
+                            ''' по правилу не нашли нужный модуль '''
                             self.parent.log_server(krconst.m_e_setting_task % self.params['taskcode'], krconst.log_error)
                             return False
                     plugin = mod.Plugin(self.PlugParams)
@@ -712,7 +712,7 @@ class QueueThread(threading.Thread):
                         if queueid:
                             self.update_status_turn_db(res['queueid'], 'E')
                     del plugin
-                except Exception as exc:
+                except Exception, exc:
                     self.TracebackLog('Error execute plugin ' + filename + ', taskcode=' + self.params['taskcode'])
                     self.TracebackLog(exc)
                     try:
@@ -726,25 +726,25 @@ class QueueThread(threading.Thread):
 
     def importer(self, location):
         """
-        РРјРїРѕСЂС‚ РјРѕРґСѓР»РµР№
-        @param location: РїРѕР»РЅС‹Р№ РїСѓС‚СЊ
+        Импорт модулей
+        @param location: полный путь
         @return:
         """
 
         if not os.access(location + '.py', os.F_OK) and not os.access(location + '.pyc', os.F_OK):
-            self.parent.log_server('РќРµ РЅР°Р№РґРµРЅ РјРѕРґСѓР»СЊ: ' + location + '.py', krconst.log_error)
+            self.parent.log_server('Не найден модуль: ' + location + '.py', krconst.log_error)
             return None
         (head, tail) = os.path.split(location)
         sys.path[0:0] = [head]
         try:
             result = __import__(tail)
-        except Exception as exc:
-            # todo Р©РµРіР»РѕРІ: С‚СѓС‚ РїРѕС‡РµРјСѓ С‚Рѕ РЅРµС‚ РІС‹РІРѕРґР° РІ Р»РѕРі, РЅРµ РїРѕРЅСЏС‚РЅРѕ РІРѕРѕР±С‰Рµ
+        except Exception, exc:
+            # todo Щеглов: тут почему то нет вывода в лог, не понятно вообще
             self.parent.log_server(exc)
-            print(exc)
+            print exc
             return None
 
-        # РїСЂРѕРІРµСЂРєР° РІРµСЂСЃРёРѕРЅРЅРѕСЃС‚Рё
+        # проверка версионности
         #if self.VesionPlugin(location):
         #    try:
         #        version = result.version
@@ -757,7 +757,7 @@ class QueueThread(threading.Thread):
 
     def VesionPlugin(self, module):
         """
-            Р—Р°РїРѕР»РЅРµРЅРёРµ СЃРїРёСЃРєР° СЃ РїР»Р°РіРёРЅР°РјРё РґР»СЏ РѕРїСЂРµРґРµР»РµРЅРёСЏ РІРµСЂСЃРёРѕРЅРЅРѕСЃС‚Рё
+            Заполнение списка с плагинами для определения версионности
         """
 
         for itm in self.versionfile:
@@ -768,8 +768,8 @@ class QueueThread(threading.Thread):
 
     def get_next_queue(self, db, params):
         """
-            РїСЂРѕРІРµСЂСЏРµРј РµСЃР»Рё Р·Р°РґР°С‡Р° РјРЅРѕРіРѕРїРѕС‚РѕС‡РЅР° С‚Рѕ Р»РѕС‡РёРј РѕР±СЉРµРєС‚ СЃР»РѕРІР°СЂСЏ,
-            С‡С‚РѕР±С‹ РЅРµ РїРѕР»СѓС‡РёС‚СЊ РѕРґРёРЅ Рё С‚РѕС‚ Р¶Рµ РёРґ Р·Р°РґР°РЅРёСЏ, РґР»СЏ СЂР°Р·РЅС‹С… РїРѕС‚РѕРєРѕРІ
+            проверяем если задача многопоточна то лочим объект словаря,
+            чтобы не получить один и тот же ид задания, для разных потоков
         """
 
         if params['quantitytread'] > 1:
@@ -836,7 +836,7 @@ class GuardDBThread(threading.Thread):
                     self.parent.stop_server(is_break=True)
                     self.dbplug = db.QueryDB(self.parent.k_conf)
                     if self.dbplug.connect:
-                        self.dbplug.close_connect()
+                        self.dbplug.CloseConnection()
                 else:
                     if (self.parent.k_conf.break_params['breakfrom'] > cur_time \
                             or self.parent.k_conf.break_params['breakto'] < cur_time) \
@@ -862,7 +862,7 @@ class GuardDBThread(threading.Thread):
             return
         self.dbplug = db.QueryDB(self.parent.k_conf)
         if self.dbplug.connect:
-            self.dbplug.close_connect()
+            self.dbplug.CloseConnection()
             self.dbplug = None
             self.parent.k_conf.status_server_queue = krconst.kr_statusserver_work
             self.parent.start_server()
